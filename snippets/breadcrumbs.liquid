@@ -1,0 +1,123 @@
+{% if show != blank %}
+    {% assign show_bread = show %}
+{% else %}
+    {% assign show_bread = false %}
+{% endif %}
+
+{% if template.name contains 'index' %}
+    {% style %}
+        #shopify-section-{{ section.id }} .breadcrumb {
+        display: none;
+        }
+    {% endstyle %}
+{% endif %}
+
+{% if template.name contains 'collection' and show_bread == false %}
+    {% style %}
+        #shopify-section-{{ section.id }} .breadcrumb {
+        display: none;
+        }
+    {% endstyle %}
+{% endif %}
+
+{% style %}
+.breadcrumb {
+text-transform: uppercase;
+padding: 2rem 0px;
+color: black;
+font-weight: bold;
+}
+
+.breadcrumb__list {
+list-style: none;
+margin: 0;
+padding: 0;
+display: flex;
+flex-direction: row;
+align-items: center;
+}
+
+.breadcrumb__item {
+display: flex;
+align-items: center;
+}
+
+.breadcrumb__text {
+margin-left: 5px;
+}
+.breadcrumb__link,
+.breadcrumb__text {
+font-size: 14px;
+color: #333;
+text-decoration: none;
+margin-right: 5px;
+/* text-transform: uppercase; */
+}
+
+.breadcrumb__item:not(:last-child)::after {
+content: "/";
+margin-left: 5px;
+margin-right: 5px;
+}
+
+.breadcrumb {
+display: block;
+}
+/* collection page */
+
+.facets-wrapper .breadcrumb {
+flex: 1;
+margin: auto;
+width: 100%;
+}
+
+@media (max-width: 749px) {
+    .breadcrumb {
+        display: none;
+    }
+}
+{% endstyle %}
+
+{%- assign breadcrumb = request.page_type -%}
+{%- assign current_title = page_title -%}
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <ul class="breadcrumb__list">
+        <li class="breadcrumb__item">
+            <a href="/" class="breadcrumb__link">Home</a>
+        </li>
+        {%- if breadcrumb == 'collection' -%}
+        <li class="breadcrumb__item">
+            <span class="breadcrumb__text">{{ collection.title }}</span>
+        </li>
+        {%- elsif breadcrumb == 'product' -%}
+        <li class="breadcrumb__item">
+            <a href="{{ product.collections.first.url }}"
+                class="breadcrumb__link">{{ product.collections.first.title }}</a>
+        </li>
+        <li class="breadcrumb__item">
+            <span class="breadcrumb__text">{{ product.title }}</span>
+        </li>
+        {%- elsif breadcrumb == 'page' -%}
+        <li class="breadcrumb__item">
+            <span class="breadcrumb__text">{{ page.title }}</span>
+        </li>
+        {%- elsif breadcrumb == 'search' -%}
+        <li class="breadcrumb__item">
+            <span class="breadcrumb__text">Search</span>
+        </li>
+        {%- elsif breadcrumb == 'policies' -%}
+        <li class="breadcrumb__item">
+            <span class="breadcrumb__text">Policies</span>
+        </li>
+        {%- elsif breadcrumb == 'cart' -%}
+        <li class="breadcrumb__item">
+            <span class="breadcrumb__text">Cart</span>
+        </li>
+        {%- elsif breadcrumb == 'account' -%}
+        <li class="breadcrumb__item">
+            <span class="breadcrumb__text">Account</span>
+        </li>
+        {%- endif -%}
+    </ul>
+</nav>

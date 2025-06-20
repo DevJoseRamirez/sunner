@@ -1,0 +1,104 @@
+{% comment %}
+Renders a standard dropdown style menu for the header.
+
+Usage:
+{% render 'footer-collapse-menu' %}
+{% endcomment %}
+
+
+{{ 'footer-collapse-menu.css' | asset_url | stylesheet_tag }}
+{{ 'component-accordion.css' | asset_url | stylesheet_tag }}
+{% assign menu_link_list = menu_list %}
+
+
+{% assign collapse = true %}
+<nav class="footer__inline-menu">
+  <ul class="list-menu list-menu--inline" role="list">
+    {%- for link in menu_link_list.links -%}
+
+    <div class="footer__accordion accordion quick-add-hidden" {{ block.shopify_attributes }}>
+      <details id="Details-{{ forloop.index0 }}-{{ section.id }}">
+
+        <summary>
+
+          {%- if link.links != blank -%}
+
+          <div class="summary__title">
+            {% comment %} {% render 'icon-accordion', icon: block.settings.icon %} {% endcomment %}
+            <h2 class="h4 accordion__title inline-richtext">
+              {{ link.title | escape }}
+            </h2>
+          </div>
+          {% render 'icon-caret' %}
+
+          {% else %}
+          <div class="summary__title">
+            {% comment %} {% render 'icon-accordion', icon: block.settings.icon %} {% endcomment %}
+            <h2 class="h4 accordion__title inline-richtext">
+              <a class="single_link" href="{{ link.url }}">
+                {{ link.title | escape }}
+              </a>
+            </h2>
+          </div>
+
+          {%- endif -%}
+
+
+        </summary>
+
+        <div class="accordion__content rte" id="FooterAccordion-{{ forloop.index0 }}-{{ section.id }}">
+
+          {%- if link.links != blank -%}
+
+          {% comment %} nested links here {% endcomment %}
+          <ul id="HeaderMenu-MenuList-{{ forloop.index }}"
+            class="footer__submenu list-menu list-menu--disclosure color-{{ section.settings.menu_color_scheme }} gradient caption-large motion-reduce global-settings-popup"
+            role="list" tabindex="-1">
+            {%- for childlink in link.links -%}
+
+            <li>
+              {%- if childlink.links == blank -%}
+              <a id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}" href="{{ childlink.url }}"
+                class="footer__menu-item list-menu__item link link--text focus-inset caption-large{% if childlink.current %} list-menu__item--active{% endif %}"
+                {% if childlink.current %} aria-current="page" {% endif %}>
+                {{ childlink.title | escape }}
+              </a>
+              {%- else -%}
+              <details id="Details-HeaderSubMenu-{{ link.handle }}-{{ childlink.handle }}">
+                <summary id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
+                  class="footer__menu-item link link--text list-menu__item focus-inset caption-large">
+                  <span>{{ childlink.title | escape }}</span>
+                  {% render 'icon-caret' %}
+                </summary>
+                <ul id="HeaderMenu-SubMenuList-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                  class="footer__submenu list-menu motion-reduce">
+                  {%- for grandchildlink in childlink.links -%}
+                  <li>
+                    <h1>grend child link - dont think we need these</h1>
+                    <a id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                      href="{{ grandchildlink.url }}"
+                      class="footer__menu-item list-menu__item link link--text focus-inset caption-large{% if grandchildlink.current %} list-menu__item--active{% endif %}"
+                      {% if grandchildlink.current %} aria-current="page" {% endif %}>
+                      {{ grandchildlink.title | escape }}
+                    </a>
+                  </li>
+                  {%- endfor -%}
+                </ul>
+              </details>
+              {%- endif -%}
+            </li>
+
+            {%- endfor -%}
+          </ul>
+
+          {%- endif -%}
+
+
+        </div>
+
+      </details>
+    </div>
+
+    {%- endfor -%}
+  </ul>
+</nav>

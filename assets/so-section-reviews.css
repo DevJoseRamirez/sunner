@@ -1,0 +1,102 @@
+@media (min-width: 992px) {
+    .with-rating > span {
+        margin-right: 14px;
+        white-space: nowrap;
+   }
+}
+.shop-rating {
+    padding-top: 0;
+    margin-bottom: 10px;
+}
+.shop-rating > a {
+    justify-content: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+.shop-rating > a i {
+    color: #ffa300;
+}
+.shop-rating > a svg {
+    width: 16px;
+    height: 16px;
+    fill: #ffa300;
+}
+@media (max-width: 991px) {
+    .shop-rating > a img {
+        margin-right: 8px;
+   }
+}
+.shop-rating .loox-rating {
+    font-size: 16px;
+    margin-right: 3px;
+}
+.shop-rating .loox-rating i {
+    font-size: 17px;
+}
+.shop-rating .loox-rating i + i {
+    margin-left: 4px;
+}
+.shop-rating span {
+    font-size: 14px;
+    font-weight: 400;
+}
+@media (min-width: 768px) {
+    .shop-rating span {
+        white-space: nowrap;
+   }
+}
+
+@media (min-width: 992px) {
+    .shop-rating > span {
+      margin-right: 14px;
+      white-space: nowrap;
+    }
+  }
+  .shop-rating {
+    padding-top: 0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+  .shop-rating .shop-rating-count,
+  .shop-rating .shop-rating-count_for_app
+  {
+    margin-left: 3px;
+    margin-top: 1px;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .shop-rating i {
+    color: #FFA300;
+    margin-right: 1px;
+  }
+  .shop-rating svg {
+    width: 15px;
+    height: 15px;
+    fill: #FFA300;
+    margin-right: 1px;
+  }
+  @media (max-width: 991px) {
+    .shop-rating img {
+      margin-right: 8px;
+    }
+  }
+  .shop-rating .loox-rating {
+    font-size: 16px;
+    margin-right: 3px;
+  }
+  .shop-rating .loox-rating i {
+    font-size: 16px;
+  }
+  .shop-rating .loox-rating i + i {
+    margin-left: 4px;
+  }
+  @media (min-width: 768px) {
+    .shop-rating span {
+      white-space: nowrap;
+    }
+  }
+  .so-hidden {
+    display: none;
+  }

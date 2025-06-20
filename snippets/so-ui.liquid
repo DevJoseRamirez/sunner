@@ -1,0 +1,398 @@
+{% comment %}
+	Renders various ShineOn-related UI elements
+
+	Accepts:
+	- product: {Object} Product Liquid object (required)
+	- show_dynamic_checkout: {Boolean} Renders the 'Buy it Now' checkout button (optional)
+{% endcomment %}
+
+{% case so-ui %}
+
+	{% when 'button-atc' %}
+		{% assign so-ui-elem = 'button-atc' %}
+		{% assign button_type = 'submit' %}
+
+	{% when 'button-atc-popup' %}
+		{% assign so-ui-elem = 'button-atc' %}
+		{% assign button_type = 'button' %}
+
+	{% when 'engraving-input' %}
+		{% assign so-ui-elem = 'engraving-input' %}
+
+	{% when 'form-atc' %}
+		{% assign so-ui-elem = 'form-atc' %}
+
+	{% when 'so-hyper-fields' %}
+		{% assign so-ui-elem = 'so-hyper-fields' %}
+
+  {% when 'so-hyper-input' %}
+    {% assign so-ui-elem = 'so-hyper-input' %}
+
+	{% when 'birthstones-options' %}
+		{% assign so-ui-elem = 'birthstones-options' %}
+
+	{% when 'accessory-options' %}
+		{% assign so-ui-elem = 'accessory-options' %}
+
+	{% when 'birthstone' %}
+		{% assign so-ui-elem = 'birthstone' %}
+
+	{% when 'accessory' %}
+		{% assign so-ui-elem = 'accessory' %}
+
+{% endcase %}
+
+{% case so-ui-elem %}
+
+	{% when 'button-atc' %}
+		{%- if product.selected_or_first_available_variant.available -%}
+			{% if btn_text_custom %}
+				{% assign btn_text = btn_text_custom %}
+			{% else %}
+				{% assign btn_text = 'products.product.add_to_cart' | t %}
+			{% endif %}
+		{%- else -%}
+			{% assign btn_text = 'products.product.sold_out' | t %}
+		{%- endif -%}
+		<button
+			id="ProductPopup-{{ button_type }}"
+			class="so-py-3 so-rounded-full so-w-full so-text-white so-border-none product-popup-modal__button{% if block.settings.show_dynamic_checkout and product.selling_plan_groups == empty %}so-bg-transparent{% else %} so-bg-secondary{% endif %} disabled:so-cursor-not-allowed disabled:so-opacity-50"
+			type="{{ button_type }}"
+			aria-haspopup="dialog"
+			{% if atc_upsell_type != 'none' and atc_upsell_type %}
+			data-upsell-type="{{ atc_upsell_type }}"
+			{% endif %}
+			{% if atc_upsell_type != 'none' and atc_upsell_type and shop_pt_id_obj.has_atc_upsell %}
+			data-upsell-type-popup="{{ atc_upsell_type }}"
+			{% endif %}
+			data-btn-text="{{ btn_text }}"
+			style="background: var(--shineon-color-buy-button-background); color: var(--shineon-color-buy-button-text);"
+		>
+			<span class="so-uppercase so-font-semibold btn-text">
+				{{ btn_text }}
+			</span>
+			<div class="loading-overlay__spinner hidden">
+				<svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+					<circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+				</svg>
+			</div>
+		</button>
+
+	{% when 'engraving-input' %}
+		<engraving-input
+						class="so-engraving-input-w no-js-hidden
+						{% if font_preview_feature %}
+							so-font-preview-input-w
+							{% if font_preview_live == true %}
+							so-font-preview-live-w
+							{% endif %}
+							{% if font_preview_fields_quantity > 1 %}
+							so-font-preview-multiple-w
+							{% endif %}
+						{% endif %}"
+						{% if atc_upsell_type != 'none' and atc_upsell_type %}
+							{% if option2 %}
+						data-option2="{{ option2 }}"
+							{% endif %}
+						data-upsell-type="{{ atc_upsell_type }}"
+						{% endif %}
+						data-section="{{ section.id }}"
+						data-url="{{ product.url }}" {{ block.shopify_attributes }}>
+			{% assign input_label = shop_cf.label %}
+			{% assign input_placeholder = shop_cf.placeholder %}
+			{% for locale in shop_cf.locales %}
+			{% if shop.locale contains locale[0] %}
+				{% assign input_label = locale[1].label %}
+				{% assign input_placeholder = locale[1].placeholder %}
+			{% endif %}
+			{% endfor %}
+			<label>
+				{% if input_label contains '--so--' %}
+					{% assign input_label = input_label | replace: '--so--maxlength--', shop_cf.maxlength %}
+				{% endif %}
+				{{ input_label }}{% if product_birthstone_multiple == true %} <span class="option-name"></span>{% endif %}
+			</label>
+			<div class="field so-input-wrap">
+
+				{% render 'product-info-shineon' with 'so-engraving-input', is_pt_with_svg_metal_swatch: is_pt_with_svg_metal_swatch, symbol_at_the_end: symbol_at_the_end, parent_wrap: parent_wrap, product_birthstone_multiple: product_birthstone_multiple, is_input_duplicated: is_input_duplicated, font_preview_heart_at_the_end_available: font_preview_heart_at_the_end_available, font_preview_live: font_preview_live, font_preview_fields_quantity: font_preview_fields_quantity, product: product, input: shop_cf, input_placeholder: input_placeholder, font_preview_feature: font_preview_feature, product_form_id: product_form_id %}
+
+				{% if product_birthstone_multiple == true %}
+					{% assign so_custom_field_info = shop_cf.maxlength | append: ' max' %}
+				{% elsif is_metal_art_prod == true %}
+					{% assign so_custom_field_info = so_custom_field_info | replace: '[variant_accessory_type]', 'max' %}
+				{% else %}
+					{% assign so_custom_field_info = so_custom_field_info | replace: '[variant_accessory_type]', variant_accessory_type %}
+				{% endif %}
+				<p class="so-custom-field-info" style="font-size: 12px; font-style: italic; margin-bottom: 0;">{{ so_custom_field_info }}</p>
+				<span class="so-input-notification" data-font-preview-notification=" {{ font_preview_feature.label }}"></span>
+
+				<label class="field__label">
+					{{ input_placeholder }}
+					{% if font_preview_feature %}
+					<span class="so-input-counter-w">
+						<span class="so-input-counter">0</span> / <span class="so-input-counter-maxlength">{{ shop_cf.maxlength }}</span>
+					</span>
+					{% endif %}
+				</label>
+			</div>
+			<span class="so-input-paste-validator so-hidden" data-font-preview-paste-validator-notification="{{ font_preview_feature.placeholder }}">{{ font_preview_feature.placeholder }}</span>
+			{% if font_preview_feature and font_preview_live == false %}
+			<div class="font-preview-inc-w">
+				<div class="font-preview-w" data-metal="{{ product.selected_or_first_available_variant.metafields.shineon.metal }}">
+					{% assign font_preview_placeholder = shop_cf.placeholder %}
+					{% if font_preview_heart_at_the_end_available == true %}
+						{% assign font_preview_placeholder = font_preview_placeholder | append: '#heart1#'  %}
+					{% endif %}
+					{% if is_pt_with_svg_metal_swatch %}
+					  {% assign flower_font_code_current = false %}
+					  {% for month in is_pt_with_svg_metal_swatch_cf.options %}
+						{% if month == product.selected_or_first_available_variant.option3 %}
+						  {% assign flower_font_code_current = flower_font_code[forloop.index0] %}
+						{% endif %}
+					  {% endfor %}
+					{% endif %}
+					{% if symbol_at_the_end %}
+					{% assign font_preview_placeholder = font_preview_placeholder | append: symbol_at_the_end.options[0].code  %}
+					{% endif %}
+					{% if is_pt_with_svg_metal_swatch %}
+					<span class="preview-flower so-hidden">{{ flower_font_code_current }}</span>
+					{% endif %}
+					<span class="preview {% if font_family_preview_class %}{{ font_family_preview_class.class }}{% endif %}{% if is_pt_with_svg_metal_swatch %} preview-with-flower{% endif %}" data-placeholder="{{ font_preview_placeholder }}">{% if is_pt_with_svg_metal_swatch %}{{ flower_font_code_current }}{% endif %}{{ font_preview_placeholder }}</span>
+				</div>
+			</div>
+			{% endif %}
+			<script type="application/json">
+				{{ product.variants | json }}
+			</script>
+			{{ shop_cf.html_chunk }}
+		</engraving-input>
+
+	{% when 'form-atc' %}
+    <div id="MainProduct-{{ section.id }}-ProductFormAnchor" {{ block.shopify_attributes }}>
+	    <so-product-form class="product-form" data-section="{{ section.id }}">
+	      <div class="product-form__error-message-wrapper" role="alert" hidden>
+	        <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-error" viewBox="0 0 13 13">
+	          <circle cx="6.5" cy="6.50049" r="5.5" stroke="white" stroke-width="2"/>
+	          <circle cx="6.5" cy="6.5" r="5.5" fill="#EB001B" stroke="#EB001B" stroke-width="0.7"/>
+	          <path d="M5.87413 3.52832L5.97439 7.57216H7.02713L7.12739 3.52832H5.87413ZM6.50076 9.66091C6.88091 9.66091 7.18169 9.37267 7.18169 9.00504C7.18169 8.63742 6.88091 8.34917 6.50076 8.34917C6.12061 8.34917 5.81982 8.63742 5.81982 9.00504C5.81982 9.37267 6.12061 9.66091 6.50076 9.66091Z" fill="white"/>
+	          <path d="M5.87413 3.17832H5.51535L5.52424 3.537L5.6245 7.58083L5.63296 7.92216H5.97439H7.02713H7.36856L7.37702 7.58083L7.47728 3.537L7.48617 3.17832H7.12739H5.87413ZM6.50076 10.0109C7.06121 10.0109 7.5317 9.57872 7.5317 9.00504C7.5317 8.43137 7.06121 7.99918 6.50076 7.99918C5.94031 7.99918 5.46982 8.43137 5.46982 9.00504C5.46982 9.57872 5.94031 10.0109 6.50076 10.0109Z" fill="white" stroke="#EB001B" stroke-width="0.7">
+	        </svg>
+	        <span class="product-form__error-message"></span>
+	      </div>
+	      {%- form 'product', product, id: product_form_id, class: 'form so-product-form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+			<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" disabled>
+			{% if shop_pt_id_obj.has_atc_upsell == true %}
+				<div class="so-text-center so-my-6">
+					<div class="so-modal-upsell-pricing-w">
+						<div class="so-modal-upsell-pricing">
+							<span class="compare_upsell_price"></span>
+							<span class="upsell_price"></span>
+						</div><!-- END so-modal-upsell-pricing -->
+						<p class="price-off unstyled saving_percents">(50% off)</p>
+					</div>
+				</div>
+			{% endif %}
+			{% assign hide_engraving = '' %}
+			{% if atc_upsell_type == 'engraving' and shop_pt_id_obj.has_atc_upsell != true and shop_pt_id_obj.has_atc_upsell %}
+				{% assign hide_engraving = ' so-hidden' %}
+			{% endif %}
+	        {% for cf in product_cf_obj %}
+				{% assign shop_cf = shop.metafields.shineon[cf.key].value %}
+				{% if shop_cf.field_type == 'engraving' or shop_cf.class contains 'so-engraving-birthstone' %}
+					{% unless atc_upsell_type == 'engraving' and shop_pt_id_obj.has_atc_upsell %}
+						{% assign is_input_duplicated = true %}
+						{% assign parent_wrap = 'form_atc' %}
+					{% endunless %}
+					<div class="so-my-3{{ hide_engraving }}{% unless atc_upsell_type == 'engraving' and shop_pt_id_obj.has_atc_upsell %} so-hidden{% endunless %}">
+						{%- render 'so-ui' with 'engraving-input', flower_font_code: flower_font_code, parent_wrap: parent_wrap, product_birthstone_multiple: product_birthstone_multiple, is_input_duplicated: is_input_duplicated, shop_cf: shop_cf, shop_pt_id_obj: shop_pt_id_obj, option2: option2, atc_upsell_type: atc_upsell_type -%}
+					</div>
+				{% endif %}
+	        {% endfor %}
+	        <div class="shopify-section shineon-theme shineon-theme--primary">
+		        <div class="product-form__buttons so-space-y-2">
+		          {%- render 'so-ui' with 'button-atc', btn_text_custom: btn_text_custom, shop_pt_id_obj: shop_pt_id_obj, atc_upsell_type: atc_upsell_type -%}
+
+		          {%- if show_dynamic_checkout -%}
+		            {{ form | payment_button }}
+		          {%- endif -%}
+		        </div>
+	        </div>
+	      {%- endform -%}
+	    </so-product-form>
+    </div>
+
+
+	{% when 'so-hyper-fields' %}
+		{% assign so_hyper_zoned_fields = product_schema_v2_obj.zoned_fields %}
+		{% assign so_hyper_zones = product_schema_v2_obj.zoned_fields.zones %}
+
+		<so-hyper-component id="engraving-fields" class="so-custom-fields-wrap so-hyper-component" data-section="{{ section.id }}">
+			{% for zone in so_hyper_zones %}
+				{% assign shop_cf_hyper = shop.metafields.shineon[zone.key].value | default: shop.metafields.shineon[zone.key] %}
+				{% assign input_label_hyper = zone.props.overrides.label | default: shop_cf_hyper.label %} 
+				{% assign input_placeholder_hyper = zone.props.overrides.placeholder | default: shop_cf_hyper.placeholder %}
+				{% assign label_counter = forloop.index | append: '. ' %}
+				{% assign input_prop_hyper = input_label_hyper | prepend: label_counter %}
+				<div class="so-my-3 so-custom-field-wrap">
+					{%- render 'so-ui' with 'so-hyper-input', section_id: section.id, shop_cf_hyper: shop_cf_hyper, zone: zone, input_placeholder_hyper: input_placeholder_hyper, input_label_hyper: input_label_hyper, product_form_id: product_form_id, input_prop_hyper: input_prop_hyper -%}
+				</div>
+			{% endfor %}
+		</so-hyper-component>
+
+
+	{% when 'so-hyper-input' %}
+		<so-hyper-input
+						class="so-hyper-input-w no-js-hidden"
+						data-section="{{ section.id }}"
+						data-url="{{ product.url }}"
+						data-zone-id="{{ zone.id }}">
+			<label>
+				<span class="label-textcontent">{{ input_label_hyper }}</span><span class="so-updating-notification so-hidden">Carousel is updating</span>
+			</label>
+			<div class="field so-hyper-input-wrap">
+
+				{% render 'product-info-shineon' with 'so-engraving-input', input_prop_hyper: input_prop_hyper, zone: zone, input_label_hyper: input_label_hyper, input_placeholder: input_placeholder_hyper, input: shop_cf_hyper, product_form_id: product_form_id %}
+
+				{% if section_id != 'product-template-shineon' %}
+					<label class="field__label">
+						{{ input_placeholder_hyper }}
+					</label>
+				{% endif %}
+			</div>
+		</so-hyper-input>
+ 
+
+	{% when 'accessory-options' %}
+		{% assign label = input.label %}
+		{% if label contains '[counter]' %}
+			{% capture counter-html %}
+				<span class="so-counter-wrap">
+					(<span class="so-counter-selected">0</span> of <span class="so-counter-amount">{{ product.selected_or_first_available_variant.metafields.shineon.engravings }}</span>)
+				</span>
+			{% endcapture %}
+			{% assign label = label | replace: '[counter]', counter-html %}
+		{% endif %}
+		<label>{{ label }}</label>
+		<accessory-options class="so-custom-field-accessory-wrap"
+						{% if product_birthstone_multiple == true %}data-multiple-selection="1"{% endif %}>
+			{% for option in input.options %}
+				{%- render 'so-ui' with 'accessory', current_variant_metafields_so: current_variant_metafields_so, accessory_type: accessory_type, product_birthstone_multiple: product_birthstone_multiple, bs_image_no_loop: bs_image_no_loop, forloop: forloop, input: input, option: option, product_form_id: product_form_id -%}
+			{% endfor %}
+		</accessory-options>
+
+
+	{% when 'birthstones-options' %}
+		{% assign label = input.label %}
+		{% if label contains '[counter]' %}
+			{% capture counter-html %}
+				<span class="so-counter-wrap">
+					(<span class="so-counter-selected">0</span> of <span class="so-counter-amount">{{ product.selected_or_first_available_variant.metafields.shineon.engravings }}</span>)
+				</span>
+			{% endcapture %}
+			{% assign label = label | replace: '[counter]', counter-html %}
+		{% endif %}
+		<label>{{ label }}</label>
+		<birthstone-options class="so-custom-field-birthstone-wrap"
+						{% if product_birthstone_multiple == true %}data-multiple-selection="1"{% endif %}>
+			{% for option in input.options %}
+				{%- render 'so-ui' with 'birthstone', current_variant_metafields_so: current_variant_metafields_so, accessory_type: accessory_type, product_birthstone_multiple: product_birthstone_multiple, bs_image_no_loop: bs_image_no_loop, forloop: forloop, input: input, option: option, product_form_id: product_form_id -%}
+			{% endfor %}
+		</birthstone-options>
+
+
+	{% when 'accessory' %}
+		<label for="so-custom-field-radio-{{ option }}" class="so-custom-field-accessory-label">
+			{% assign value_short = option %}
+			{% if accessory_type == 'birthstone' %}
+			{% assign month_arr = 'months_arr' | t | split: ', ' %}
+			{% assign value_short = month_arr[forloop.index0] | truncate: 3, "" %}
+			{% endif %}
+			<input
+				id="so-custom-field-radio-{{ option }}"
+				class="{{ input.class }}"
+				type="radio"
+				autocomplete="off"
+				{% unless input.type == 'none' %}
+				name="properties[{{ input.name }}]"
+				{% else %}
+				{% comment %}SUS-2213 cf_43 placeholder should be same as BS name {% endcomment %}
+				{% if product_birthstone_multiple == true %}
+					data-name="properties[{{ input.placeholder }}"
+				{% else %}
+					data-name="properties[{{ input.name }}"
+				{% endif %}
+				{% endunless %}
+				{% if product_birthstone_multiple == true %}
+				value="{{ variant_accessory_quantity }}"
+				{% else %}
+				value="{{ option }}"
+				{% endif %}
+				{% if product_form_id %}
+				form="{{ product_form_id }}"
+				{% endif %}
+				data-option-value="{{ option }}"
+				data-option-value-short = "{{ value_short }}"
+				data-src-bigimg="https://cdn.shopify.com/s/files/1/0077/2420/4096/files/bs-{{ option }}_x100.png"
+				{% if input.required == 1 %}
+				required
+				{% endif %}
+				/>
+				{% if accessory_type == 'birthstone' %}
+					{% if section.settings.birthstone_style_selector != "no-stones" %}
+					<div class="so-custom-field-birthstone-circle {% if bs_image_no_loop == true %}bs-image-no-loop{% endif %} {{ option }}"></div>
+					{% endif %}
+					{% if section.settings.birthstone_style_selector != "no-months" %}
+						{{ month_arr[forloop.index0] | truncate: 3, "" }}
+					{% endif %}
+				{% else %}
+					<div class="so-custom-field-accessory-img {{ accessory_type }}" data-metal="{{ current_variant_metafields_so.metal }}">
+						{% assign gender = 'gender-' | append: option %}
+						{% render 'shineon-app-icons' with gender %}
+					</div>
+					{{ value_short }}
+				{% endif %}
+		</label>
+
+
+	{% when 'birthstone' %}
+		<label for="so-custom-field-radio-{{ option }}" class="so-custom-field-birthstone-label">
+			{% assign month_arr = 'months_arr' | t | split: ', ' %}
+			<input
+				id="so-custom-field-radio-{{ option }}"
+				class="{{ input.class }}"
+				type="radio"
+				autocomplete="off"
+				{% unless input.type == 'none' %}
+				name="properties[{{ input.name }}]"
+				{% else %}
+				{% comment %}SUS-2213 cf_43 placeholder should be same as BS name {% endcomment %}
+				{% if product_birthstone_multiple == true %}
+					data-name="properties[{{ input.placeholder }}"
+				{% else %}
+					data-name="properties[{{ input.name }}"
+				{% endif %}
+				{% endunless %}
+				{% if product_birthstone_multiple == true %}
+				value="{{ variant_accessory_quantity }}"
+				{% else %}
+				value="{{ option }}"
+				{% endif %}
+				{% if product_form_id %}
+				form="{{ product_form_id }}"
+				{% endif %}
+				data-option-value="{{ option }}"
+				data-option-value-short = "{{ month_arr[forloop.index0] | truncate: 3, "" }}"
+				data-src-bigimg="https://cdn.shopify.com/s/files/1/0077/2420/4096/files/bs-{{ option }}_x100.png"
+				{% if input.required == 1 %}
+				required
+				{% endif %}
+				/>
+			{% if section.settings.birthstone_style_selector != "no-stones" %}
+			<div class="so-custom-field-birthstone-circle {% if bs_image_no_loop == true %}bs-image-no-loop{% endif %} {{ option }}"></div>
+			{% endif %}
+			{% if section.settings.birthstone_style_selector != "no-months" %}
+				{{ month_arr[forloop.index0] | truncate: 3, "" }}
+			{% endif %}
+		</label>
+
+{% endcase %}

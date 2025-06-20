@@ -1,0 +1,57 @@
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "40421ea9-5f50-4a75-bab0-da57e077ffe8": {
+          "type": "link_list",
+          "settings": {
+            "menu": "main-menu-2"
+          }
+        },
+        "a3995b08-7dd6-42ee-9027-57980c974c0e": {
+          "type": "footer_form",
+          "settings": {
+            "use_shopify_form": false,
+            "form_text": "10% OFF YOUR FIRST ORDER!",
+            "success_text": "THANK YOU! WELCOM ON BOARD!",
+            "success_subtext": "IN A FEW MOMENTS YOU WILL RECEIVE A CONFIRMATION EMAIL WITH A CODE FOR 10% OFF YOUR FIRST ORDER.",
+            "main_color": "#ffffff",
+            "secondary_color": "#222222"
+          }
+        },
+        "77ef77d0-7a28-4d31-9dd9-9a8ba0e2807b": {
+          "type": "link_list",
+          "settings": {
+            "menu": "footer"
+          }
+        }
+      },
+      "block_order": [
+        "40421ea9-5f50-4a75-bab0-da57e077ffe8",
+        "a3995b08-7dd6-42ee-9027-57980c974c0e",
+        "77ef77d0-7a28-4d31-9dd9-9a8ba0e2807b"
+      ],
+      "settings": {
+        "color_scheme": "accent-1",
+        "newsletter_enable": false,
+        "newsletter_heading": "Subscribe to our emails",
+        "enable_follow_on_shop": false,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false,
+        "payment_enable": false,
+        "show_copyright": false,
+        "show_policy": false,
+        "margin_top": 0,
+        "padding_top": 16,
+        "padding_bottom": 16
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

@@ -1,0 +1,42 @@
+{% comment %}
+    Renders the ShineOn Product Banner, optionally replacing dynamic properties provided by the seller.
+
+    Accepts:
+    - product: {Object} Product Liquid object
+    - use_variant: {Boolean} Uses selected or first variant price instead of overall product pricing
+    - title: {String}
+
+    Usage:
+    {% render 'shineon-product-banner', product: product, use_variant: true, title: title %}
+{% endcomment %}
+{%- liquid
+  if use_variant
+    assign target = product.selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+  assign available = target.available | default: false
+  assign money_price = price | money
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+  endif
+
+  if compare_at_price > price
+    assign percent_off = compare_at_price | minus: price | times: 100.0 | divided_by: compare_at_price | round | append: '%'
+  else
+    assign percent_off = 0
+  endif
+
+  if target == product and product.price_varies
+    assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+-%}
+
+{% unless percent_off == 0 %}
+    <div class="so-px-4 so-py-1.5 so-bg-primary so-text-center">
+        <span class="so-uppercase so-text-white so-font-semibold so-text-lg">{{ title | replace: '%percent_off%', percent_off }}</span>
+    </div>
+{% endunless %}

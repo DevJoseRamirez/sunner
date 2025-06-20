@@ -1,0 +1,91 @@
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement-bar-0": {
+          "type": "announcement",
+          "settings": {
+            "text": "ALL TEES RESTOCKED | 20% OFF SITEWIDE",
+            "link": ""
+          }
+        },
+        "75af0f47-818d-4fd7-b865-2f92148faf43": {
+          "type": "announcement",
+          "disabled": true,
+          "settings": {
+            "text": "20% OFF SITEWIDE",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement-bar-0",
+        "75af0f47-818d-4fd7-b865-2f92148faf43"
+      ],
+      "disabled": true,
+      "settings": {
+        "color_scheme": "accent-1",
+        "show_line_separator": true,
+        "show_social": false,
+        "auto_rotate": false,
+        "change_slides_speed": 5,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "blocks": {
+        "2fec70fb-cda3-42a5-87c7-6c1d434ef7c6": {
+          "type": "alt-header",
+          "settings": {
+            "alt_logo_position": "middle-center",
+            "alt_menu": "main-menu-2",
+            "alt_menu_type_desktop": "dropdown",
+            "up_case": true,
+            "show_line_separator": true
+          }
+        }
+      },
+      "block_order": [
+        "2fec70fb-cda3-42a5-87c7-6c1d434ef7c6"
+      ],
+      "settings": {
+        "logo_position": "top-center",
+        "menu": "main-menu-2",
+        "menu_type_desktop": "drawer",
+        "sticky_header_type": "always",
+        "header_float": true,
+        "show_line_separator": false,
+        "color_scheme": "background-1",
+        "menu_color_scheme": "background-1",
+        "enable_country_selector": false,
+        "enable_language_selector": false,
+        "mobile_logo_position": "center",
+        "margin_bottom": 0,
+        "padding_top": 4,
+        "padding_bottom": 8
+      }
+    },
+    "b2ae10c3-9256-4bbf-a189-bffed4500283": {
+      "type": "page-change",
+      "disabled": true,
+      "settings": {
+        "image": "shopify:\/\/shop_images\/Sunner.svg"
+      }
+    },
+    "61d877ca-12ad-469e-a397-f02b89745688": {
+      "type": "breadcrumbs",
+      "settings": {}
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header",
+    "b2ae10c3-9256-4bbf-a189-bffed4500283",
+    "61d877ca-12ad-469e-a397-f02b89745688"
+  ]
+}
