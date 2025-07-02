@@ -14,6 +14,9 @@
   .drawer {
     visibility: hidden;
   }
+  .mystery-tee-selector {
+    padding: 1rem;
+  }
 </style>
 
 <cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
@@ -113,6 +116,10 @@
 
                   <tbody role="rowgroup">
                     {%- for item in cart.items -%}
+
+
+
+
                       <tr id="CartDrawer-Item-{{ item.index | plus: 1 }}" class="cart-item" role="row">
                         <td class="cart-item__media" role="cell" headers="CartDrawer-ColumnProductImage">
                           {% if item.image %}
@@ -137,6 +144,30 @@
                           <a href="{{ item.url }}" class="cart-item__name h4 break">
                             {{- item.product.title | escape -}}
                           </a>
+
+
+{% comment %} // MYSTERY TEE {% endcomment %}
+
+{%- if item.product.handle == 'sundance-tee' -%}
+  <div class="cart-item__option-select">
+    <label for="MysteryTeeSelect">Select Size:</label>
+<select
+  class="mystery-tee-selector"
+  data-index="{{ forloop.index }}"
+  name="attributes[mystery_tee_variant]"
+>
+  {% for variant in item.product.variants %}
+    <option value="{{ variant.id }}" {% if variant.id == item.variant.id %}selected{% endif %}>
+      {{ variant.title }}
+    </option>
+  {% endfor %}
+</select>
+
+
+  </div>
+{%- endif -%}
+
+
 
                           {%- if item.original_price != item.final_price -%}
                             <div class="cart-item__discounted-prices">
@@ -288,6 +319,12 @@
                         >
                           <quantity-popover>
                             <div class="cart-item__quantity-wrapper quantity-popover-wrapper">
+
+
+
+
+{%- unless item.product.handle == 'sundance-tee' -%}
+
                               <div class="quantity-popover-container{% if has_qty_rules or has_vol_pricing %} quantity-popover-container--hover{% endif %}">
                                 <quantity-input class="quantity cart-quantity">
                                   <button class="quantity__button no-js-hidden" name="minus" type="button">
@@ -330,6 +367,10 @@
                                   </button>
                                 </quantity-input>
                               </div>
+
+{% endunless %}
+
+
                               <cart-remove-button
                                 id="CartDrawer-Remove-{{ item.index | plus: 1 }}"
                                 data-index="{{ item.index | plus: 1 }}"
@@ -446,6 +487,10 @@
                           </quantity-popover>
                         </td>
                       </tr>
+
+
+
+
                     {%- endfor -%}
                   </tbody>
                 </table>
@@ -542,6 +587,10 @@
     </div>
   </div>
 </cart-drawer>
+
+
+
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {

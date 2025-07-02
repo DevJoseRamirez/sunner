@@ -42,9 +42,32 @@ class CartItems extends HTMLElement {
     }
   }
 
-  onChange(event) {
-    this.updateQuantity(event.target.dataset.index, event.target.value, document.activeElement.getAttribute('name'), event.target.dataset.quantityVariantId);
+  // 
+  // onChange(event) {
+    // this.updateQuantity(event.target.dataset.index, event.target.value, document.activeElement.getAttribute('name'), event.target.dataset.quantityVariantId);
+  // }
+
+onChange(event) {
+  const target = event.target;
+  const lineIndex = parseInt(target.dataset.index, 10);
+  const value = target.value;
+
+  // Check if this is the mystery tee selector based on input type and/or class
+  if (target.classList.contains('mystery-tee-selector') || (target.tagName === 'SELECT' && target.name === 'mystery-tee')) {
+    this.updateMysteryTeeVariant(lineIndex, parseInt(value, 10));
+  } else if (target.type === 'number') {
+    // Standard quantity change
+    this.updateQuantity(
+      lineIndex,
+      value,
+      document.activeElement.getAttribute('name'),
+      target.dataset.quantityVariantId
+    );
   }
+}
+
+
+
 
   onCartUpdate() {
     if (this.tagName === 'CART-DRAWER-ITEMS') {
@@ -222,9 +245,75 @@ class CartItems extends HTMLElement {
     cartItemElements.forEach((overlay) => overlay.classList.add('hidden'));
     cartDrawerItemElements.forEach((overlay) => overlay.classList.add('hidden'));
   }
+
+
+
+// MYSTERY TEE
+updateMysteryTeeVariant(lineIndex, newVariantId) {
+  // Show loading overlay on the targeted line
+  this.enableLoading(lineIndex);
+
+  const removeBody = JSON.stringify({
+    line: lineIndex,
+    quantity: 0,
+    sections: this.getSectionsToRender().map(section => section.section),
+    sections_url: window.location.pathname,
+  });
+
+  fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body: removeBody })
+    .then((removeRes) => removeRes.text())
+    .then(() => {
+      const addBody = JSON.stringify({
+        id: newVariantId,
+        quantity: 1,
+        sections: this.getSectionsToRender().map(section => section.section),
+        sections_url: window.location.pathname,
+      });
+
+      return fetch(`${routes.cart_add_url}`, { ...fetchConfig(), body: addBody });
+    })
+    .then((addRes) => addRes.text())
+    .then((state) => {
+      const parsedState = JSON.parse(state);
+      this.classList.toggle('is-empty', parsedState.item_count === 0);
+
+      this.getSectionsToRender().forEach((section) => {
+        const elementToReplace =
+          document.getElementById(section.id).querySelector(section.selector) || document.getElementById(section.id);
+        elementToReplace.innerHTML = this.getSectionInnerHTML(parsedState.sections[section.section], section.selector);
+      });
+
+      publish(PUB_SUB_EVENTS.cartUpdate, {
+        source: 'mystery-tee-update',
+        cartData: parsedState,
+        variantId: newVariantId,
+      });
+    })
+    .catch(() => {
+      this.querySelectorAll('.loading-overlay').forEach((overlay) => overlay.classList.add('hidden'));
+      const errors = document.getElementById('cart-errors') || document.getElementById('CartDrawer-CartErrors');
+      if (errors) errors.textContent = window.cartStrings.error;
+    })
+    .finally(() => {
+      // Hide loading overlay after all is done
+      this.disableLoading(lineIndex);
+    });
 }
 
+
+
+
+
+
+
+}
+
+
+
 customElements.define('cart-items', CartItems);
+
+
+
 
 if (!customElements.get('cart-note')) {
   customElements.define(
@@ -244,3 +333,6 @@ if (!customElements.get('cart-note')) {
     }
   );
 }
+
+
+

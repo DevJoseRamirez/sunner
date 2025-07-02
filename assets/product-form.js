@@ -82,6 +82,9 @@ if (!customElements.get('product-form')) {
               quickAddModal.hide(true);
             } else {
               this.cart.renderContents(response);
+              this.addMysteryTeeToCart();
+
+
             }
           })
           .catch((e) => {
@@ -109,6 +112,67 @@ if (!customElements.get('product-form')) {
           this.errorMessage.textContent = errorMessage;
         }
       }
+
+// MYSTERY TEE
+addMysteryTeeToCart() {
+  const MYSTERY_TEE_HANDLE = 'sundance-tee'; // update as needed
+  const MYSTERY_TEE_DEFAULT_SIZE = 'Medium'; // default size if dynamic logic isn't in place
+
+  fetch('/cart.js')
+    .then((res) => res.json())
+    .then((cart) => {
+      const alreadyInCart = cart.items.some(item =>
+        item.handle === MYSTERY_TEE_HANDLE
+      );
+
+      if (alreadyInCart) return; // 🛑 Don't add again
+
+      // Fetch the product and add the mystery tee
+      return fetch(`/products/${MYSTERY_TEE_HANDLE}.js`)
+        .then(res => res.json())
+        .then(product => {
+          const matchingVariant = product.variants.find(v =>
+            v.title.toLowerCase().includes(MYSTERY_TEE_DEFAULT_SIZE.toLowerCase())
+          ) || product.variants[0];
+
+          if (!matchingVariant) return;
+
+          const mysteryConfig = fetchConfig('javascript');
+          mysteryConfig.headers['X-Requested-With'] = 'XMLHttpRequest';
+          delete mysteryConfig.headers['Content-Type'];
+
+          const mysteryData = new FormData();
+          mysteryData.append('id', matchingVariant.id);
+          mysteryData.append('quantity', 1);
+
+          if (this.cart) {
+            mysteryData.append(
+              'sections',
+              this.cart.getSectionsToRender().map((section) => section.id)
+            );
+            mysteryData.append('sections_url', window.location.pathname);
+          }
+
+          mysteryConfig.body = mysteryData;
+
+          return fetch(`${routes.cart_add_url}`, mysteryConfig);
+        });
+    })
+    .then((res) => res?.json?.())
+    .then((response) => {
+      if (response && this.cart) {
+        this.cart.renderContents(response);
+      }
+    })
+    .catch(console.error);
+}
+
+
+
+
+
+
+
     }
   );
 }
