@@ -3551,8 +3551,11 @@ details-disclosure > details {
 
 
 /* ============================ CUSTOM STYLES HERE ============================  */
+.color-value, 
 .color-count {
   font-size: 1.2rem;
+  text-transform: uppercase;
+  opacity: .9;
 }
 
 /* Hide mobile-only divs on larger screens */

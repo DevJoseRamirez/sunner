@@ -1,3 +1,4 @@
+
 {{ 'template-collection.css' | asset_url | stylesheet_tag }}
 {{ 'component-loading-overlay.css' | asset_url | stylesheet_tag }}
 {{ 'component-card.css' | asset_url | stylesheet_tag }}
@@ -197,7 +198,94 @@
                 grid--{{ section.settings.columns_desktop }}-col-desktop
               "
             >
-              {%- for product in collection.products -%}
+
+{% if section.settings.show_variants %}
+
+
+{% comment %} WORKING HERE {% endcomment %}
+{% assign card_string = '' %}
+
+{% comment %} create product card array sort via variant id {% endcomment %}
+{% for product in collection.products %}
+  {% assign seen_colors = '' %}
+  {% for variant in product.variants %}
+    {% assign color = variant.option1 %}
+    {% unless seen_colors contains color %}
+      {% assign seen_colors = seen_colors | append: color | append: ',' %}
+
+      {%- capture card_html -%}
+        <li class="grid__item">
+          {% render 'card-product',
+            card_product: product,
+            variant: variant,
+            image: variant.image,
+            media_aspect_ratio: section.settings.image_ratio,
+            image_shape: section.settings.image_shape,
+            show_secondary_image: section.settings.show_secondary_image,
+            show_vendor: section.settings.show_vendor,
+            show_color_count: section.settings.show_color_count,
+            show_rating: section.settings.show_rating,
+            lazy_load: false,
+            show_quick_add: section.settings.enable_quick_add,
+            section_id: section.id
+          %}
+        </li>
+      {%- endcapture -%}
+
+      {% assign sort_key = variant.id | modulo: 10000 %}
+      {% comment %} <p style="font-size:12px;color:red;">Sort Key: {{ sort_key }}</p><br> {% endcomment %}
+
+
+      {% capture card_block %}
+        {{ sort_key }}||{{ product.id }}||{{ card_html }}::split::
+      {% endcapture %}
+
+      {% assign card_string = card_string | append: card_block %}
+    {% endunless %}
+  {% endfor %}
+{% endfor %}
+
+
+{% assign sorted_array = card_string | split: '::split::' | sort %}
+{% assign clean_array = '' %}
+{% assign defer_array = '' %}
+{% assign last_product_id = '' %}
+
+{% comment %} ensure product dont appear inline {% endcomment %}
+{%- for entry in sorted_array -%}
+  {% assign parts = entry | split: '||' %}
+  {% assign sort_key = parts[0] %}
+  {% assign product_id = parts[1] %}
+  {% assign html = parts[2] %}
+
+  {% if product_id == last_product_id %}
+    {% assign defer_array = defer_array | append: entry | append: '::split::' %}
+  {% else %}
+    {% assign clean_array = clean_array | append: entry | append: '::split::' %}
+    {% assign last_product_id = product_id %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} assign product card array {% endcomment %}
+{% assign final_array = clean_array | append: defer_array | split: '::split::' %}
+
+{% comment %} render cards {% endcomment %}
+{%- for entry in final_array -%}
+  {% unless entry == '' %}
+    {% assign parts = entry | split: '||' %}
+    {{ parts[2] }}
+  {% endunless %}
+{%- endfor -%}
+
+
+{% comment %} WORKING HERE {% endcomment %}
+
+
+
+{% else %}
+
+
+            {%- for product in collection.products -%}
                 {% assign lazy_load = false %}
                 {%- if forloop.index > 2 -%}
                   {%- assign lazy_load = true -%}
@@ -222,7 +310,17 @@
                     section_id: section.id
                   %}
                 </li>
-              {%- endfor -%}
+              {%- endfor -%} 
+
+
+
+{% endif %}
+
+
+
+
+
+
             </ul>
 
             {%- if paginate.pages > 1 -%}
@@ -252,6 +350,12 @@
       "default": 16,
       "label": "t:sections.main-collection-product-grid.settings.products_per_page.label"
     },
+    {
+"type": "checkbox",
+"id": "show_variants",
+"label": "Show Variant Listing As Well",
+"default": false
+},
     {
       "type": "range",
       "id": "columns_desktop",
