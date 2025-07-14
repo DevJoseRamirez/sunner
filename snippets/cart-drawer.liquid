@@ -17,6 +17,10 @@
   .mystery-tee-selector {
     padding: 1rem;
   }
+  .cart-item-col {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+  }
 </style>
 
 <cart-drawer class="drawer{% if cart == empty %} is-empty{% endif %}">
@@ -114,7 +118,7 @@
                     </tr>
                   </thead>
 
-                  <tbody role="rowgroup">
+                  <tbody class="cart-item-col" role="rowgroup">
                     {%- for item in cart.items -%}
 
 
@@ -124,7 +128,12 @@
                         <td class="cart-item__media" role="cell" headers="CartDrawer-ColumnProductImage">
                           {% if item.image %}
                             {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
-                            <a href="{{ item.url }}" class="cart-item__link" tabindex="-1" aria-hidden="true"> </a>
+                            <a 
+                            {% unless item.product.handle == 'sunner-mystery-tee' %}
+                              href="{{ item.url }}" 
+                            {% endunless %}
+                            
+                            class="cart-item__link" tabindex="-1" aria-hidden="true"> </a>
                             <img
                               class="cart-item__image"
                               src="{{ item.image | image_url: width: 300 }}"
@@ -141,14 +150,20 @@
                             <p class="caption-with-letter-spacing light">{{ item.product.vendor }}</p>
                           {%- endif -%}
 
-                          <a href="{{ item.url }}" class="cart-item__name h4 break">
+                          <a 
+                          
+                            {% unless item.product.handle == 'sunner-mystery-tee' %}
+                              href="{{ item.url }}" 
+                            {% endunless %}
+                          
+                          class="cart-item__name h4 break">
                             {{- item.product.title | escape -}}
                           </a>
 
 
 {% comment %} // MYSTERY TEE {% endcomment %}
 
-{%- if item.product.handle == 'sundance-tee' -%}
+{%- if item.product.handle == 'sunner-mystery-tee' -%}
   <div class="cart-item__option-select">
     <label for="MysteryTeeSelect">Select Size:</label>
 <select
@@ -323,7 +338,7 @@
 
 
 
-{%- unless item.product.handle == 'sundance-tee' -%}
+{%- unless item.product.handle == 'sunner-mystery-tee' -%}
 
                               <div class="quantity-popover-container{% if has_qty_rules or has_vol_pricing %} quantity-popover-container--hover{% endif %}">
                                 <quantity-input class="quantity cart-quantity">

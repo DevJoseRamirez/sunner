@@ -207,6 +207,9 @@
 
 {% comment %} create product card array sort via variant id {% endcomment %}
 {% for product in collection.products %}
+  {% if product.handle == 'sunner-mystery-tee' %}
+    {% continue %}
+  {% endif %}
   {% assign seen_colors = '' %}
   {% for variant in product.variants %}
     {% assign color = variant.option1 %}
@@ -286,6 +289,9 @@
 
 
             {%- for product in collection.products -%}
+                {% if product.handle == 'sunner-mystery-tee' %}
+                  {% continue %}
+                {% endif %}
                 {% assign lazy_load = false %}
                 {%- if forloop.index > 2 -%}
                   {%- assign lazy_load = true -%}

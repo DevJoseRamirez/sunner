@@ -1,42 +1,47 @@
-if (!customElements.get('product-form')) {
+if (!customElements.get("product-form")) {
   customElements.define(
-    'product-form',
+    "product-form",
     class ProductForm extends HTMLElement {
       constructor() {
         super();
 
-        this.form = this.querySelector('form');
-        this.form.querySelector('[name=id]').disabled = false;
-        this.form.addEventListener('submit', this.onSubmitHandler.bind(this));
-        this.cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+        this.form = this.querySelector("form");
+        this.form.querySelector("[name=id]").disabled = false;
+        this.form.addEventListener("submit", this.onSubmitHandler.bind(this));
+        this.cart =
+          document.querySelector("cart-notification") ||
+          document.querySelector("cart-drawer");
         this.submitButton = this.querySelector('[type="submit"]');
 
-        if (document.querySelector('cart-drawer')) this.submitButton.setAttribute('aria-haspopup', 'dialog');
+        if (document.querySelector("cart-drawer"))
+          this.submitButton.setAttribute("aria-haspopup", "dialog");
 
-        this.hideErrors = this.dataset.hideErrors === 'true';
+        this.hideErrors = this.dataset.hideErrors === "true";
       }
 
       onSubmitHandler(evt) {
         evt.preventDefault();
-        if (this.submitButton.getAttribute('aria-disabled') === 'true') return;
+        if (this.submitButton.getAttribute("aria-disabled") === "true") return;
 
         this.handleErrorMessage();
 
-        this.submitButton.setAttribute('aria-disabled', true);
-        this.submitButton.classList.add('loading');
-        this.querySelector('.loading-overlay__spinner').classList.remove('hidden');
+        this.submitButton.setAttribute("aria-disabled", true);
+        this.submitButton.classList.add("loading");
+        this.querySelector(".loading-overlay__spinner").classList.remove(
+          "hidden"
+        );
 
-        const config = fetchConfig('javascript');
-        config.headers['X-Requested-With'] = 'XMLHttpRequest';
-        delete config.headers['Content-Type'];
+        const config = fetchConfig("javascript");
+        config.headers["X-Requested-With"] = "XMLHttpRequest";
+        delete config.headers["Content-Type"];
 
         const formData = new FormData(this.form);
         if (this.cart) {
           formData.append(
-            'sections',
+            "sections",
             this.cart.getSectionsToRender().map((section) => section.id)
           );
-          formData.append('sections_url', window.location.pathname);
+          formData.append("sections_url", window.location.pathname);
           this.cart.setActiveElement(document.activeElement);
         }
         config.body = formData;
@@ -46,18 +51,19 @@ if (!customElements.get('product-form')) {
           .then((response) => {
             if (response.status) {
               publish(PUB_SUB_EVENTS.cartError, {
-                source: 'product-form',
-                productVariantId: formData.get('id'),
+                source: "product-form",
+                productVariantId: formData.get("id"),
                 errors: response.errors || response.description,
                 message: response.message,
               });
               this.handleErrorMessage(response.description);
 
-              const soldOutMessage = this.submitButton.querySelector('.sold-out-message');
+              const soldOutMessage =
+                this.submitButton.querySelector(".sold-out-message");
               if (!soldOutMessage) return;
-              this.submitButton.setAttribute('aria-disabled', true);
-              this.submitButton.querySelector('span').classList.add('hidden');
-              soldOutMessage.classList.remove('hidden');
+              this.submitButton.setAttribute("aria-disabled", true);
+              this.submitButton.querySelector("span").classList.add("hidden");
+              soldOutMessage.classList.remove("hidden");
               this.error = true;
               return;
             } else if (!this.cart) {
@@ -66,12 +72,16 @@ if (!customElements.get('product-form')) {
             }
 
             if (!this.error)
-              publish(PUB_SUB_EVENTS.cartUpdate, { source: 'product-form', productVariantId: formData.get('id'), cartData: response });
+              publish(PUB_SUB_EVENTS.cartUpdate, {
+                source: "product-form",
+                productVariantId: formData.get("id"),
+                cartData: response,
+              });
             this.error = false;
-            const quickAddModal = this.closest('quick-add-modal');
+            const quickAddModal = this.closest("quick-add-modal");
             if (quickAddModal) {
               document.body.addEventListener(
-                'modalClosed',
+                "modalClosed",
                 () => {
                   setTimeout(() => {
                     this.cart.renderContents(response);
@@ -83,18 +93,19 @@ if (!customElements.get('product-form')) {
             } else {
               this.cart.renderContents(response);
               this.addMysteryTeeToCart();
-
-
             }
           })
           .catch((e) => {
             console.error(e);
           })
           .finally(() => {
-            this.submitButton.classList.remove('loading');
-            if (this.cart && this.cart.classList.contains('is-empty')) this.cart.classList.remove('is-empty');
-            if (!this.error) this.submitButton.removeAttribute('aria-disabled');
-            this.querySelector('.loading-overlay__spinner').classList.add('hidden');
+            this.submitButton.classList.remove("loading");
+            if (this.cart && this.cart.classList.contains("is-empty"))
+              this.cart.classList.remove("is-empty");
+            if (!this.error) this.submitButton.removeAttribute("aria-disabled");
+            this.querySelector(".loading-overlay__spinner").classList.add(
+              "hidden"
+            );
           });
       }
 
@@ -102,77 +113,84 @@ if (!customElements.get('product-form')) {
         if (this.hideErrors) return;
 
         this.errorMessageWrapper =
-          this.errorMessageWrapper || this.querySelector('.product-form__error-message-wrapper');
+          this.errorMessageWrapper ||
+          this.querySelector(".product-form__error-message-wrapper");
         if (!this.errorMessageWrapper) return;
-        this.errorMessage = this.errorMessage || this.errorMessageWrapper.querySelector('.product-form__error-message');
+        this.errorMessage =
+          this.errorMessage ||
+          this.errorMessageWrapper.querySelector(
+            ".product-form__error-message"
+          );
 
-        this.errorMessageWrapper.toggleAttribute('hidden', !errorMessage);
+        this.errorMessageWrapper.toggleAttribute("hidden", !errorMessage);
 
         if (errorMessage) {
           this.errorMessage.textContent = errorMessage;
         }
       }
 
-// MYSTERY TEE
-addMysteryTeeToCart() {
-  const MYSTERY_TEE_HANDLE = 'sundance-tee'; // update as needed
-  const MYSTERY_TEE_DEFAULT_SIZE = 'Medium'; // default size if dynamic logic isn't in place
+      // MYSTERY TEE
+      addMysteryTeeToCart() {
+        const MYSTERY_TEE_HANDLE = "sunner-mystery-tee"; // update as needed
+        const MYSTERY_TEE_DEFAULT_SIZE = "Medium"; // default size if dynamic logic isn't in place
+        const REQUIRED_TAG = "freegift";
 
-  fetch('/cart.js')
-    .then((res) => res.json())
-    .then((cart) => {
-      const alreadyInCart = cart.items.some(item =>
-        item.handle === MYSTERY_TEE_HANDLE
-      );
-
-      if (alreadyInCart) return; // 🛑 Don't add again
-
-      // Fetch the product and add the mystery tee
-      return fetch(`/products/${MYSTERY_TEE_HANDLE}.js`)
-        .then(res => res.json())
-        .then(product => {
-          const matchingVariant = product.variants.find(v =>
-            v.title.toLowerCase().includes(MYSTERY_TEE_DEFAULT_SIZE.toLowerCase())
-          ) || product.variants[0];
-
-          if (!matchingVariant) return;
-
-          const mysteryConfig = fetchConfig('javascript');
-          mysteryConfig.headers['X-Requested-With'] = 'XMLHttpRequest';
-          delete mysteryConfig.headers['Content-Type'];
-
-          const mysteryData = new FormData();
-          mysteryData.append('id', matchingVariant.id);
-          mysteryData.append('quantity', 1);
-
-          if (this.cart) {
-            mysteryData.append(
-              'sections',
-              this.cart.getSectionsToRender().map((section) => section.id)
+        fetch("/cart.js")
+          .then((res) => res.json())
+          .then((cart) => {
+            const alreadyInCart = cart.items.some(
+              (item) => item.handle === MYSTERY_TEE_HANDLE
             );
-            mysteryData.append('sections_url', window.location.pathname);
-          }
 
-          mysteryConfig.body = mysteryData;
+            if (alreadyInCart) return; // 🛑 Don't add again
 
-          return fetch(`${routes.cart_add_url}`, mysteryConfig);
-        });
-    })
-    .then((res) => res?.json?.())
-    .then((response) => {
-      if (response && this.cart) {
-        this.cart.renderContents(response);
+            // Fetch the product and add the mystery tee
+            return fetch(`/products/${MYSTERY_TEE_HANDLE}.js`)
+              .then((res) => {
+                if (!res.ok) throw new Error("Mystery tee product not found");
+                return res.json();
+              })
+              .then((product) => {
+                console.log(product.tags);
+                if (!product.tags.includes(REQUIRED_TAG)) return;
+                const matchingVariant =
+                  product.variants.find((v) =>
+                    v.title
+                      .toLowerCase()
+                      .includes(MYSTERY_TEE_DEFAULT_SIZE.toLowerCase())
+                  ) || product.variants[0];
+
+                if (!matchingVariant) return;
+
+                const mysteryConfig = fetchConfig("javascript");
+                mysteryConfig.headers["X-Requested-With"] = "XMLHttpRequest";
+                delete mysteryConfig.headers["Content-Type"];
+
+                const mysteryData = new FormData();
+                mysteryData.append("id", matchingVariant.id);
+                mysteryData.append("quantity", 1);
+
+                if (this.cart) {
+                  mysteryData.append(
+                    "sections",
+                    this.cart.getSectionsToRender().map((section) => section.id)
+                  );
+                  mysteryData.append("sections_url", window.location.pathname);
+                }
+
+                mysteryConfig.body = mysteryData;
+
+                return fetch(`${routes.cart_add_url}`, mysteryConfig);
+              });
+          })
+          .then((res) => res?.json?.())
+          .then((response) => {
+            if (response && this.cart) {
+              this.cart.renderContents(response);
+            }
+          })
+          .catch(console.error);
       }
-    })
-    .catch(console.error);
-}
-
-
-
-
-
-
-
     }
   );
 }
