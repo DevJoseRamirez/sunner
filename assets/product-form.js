@@ -19,12 +19,101 @@ if (!customElements.get("product-form")) {
         this.hideErrors = this.dataset.hideErrors === "true";
       }
 
+      // onSubmitHandler(evt) {
+      //   evt.preventDefault();
+      //   if (this.submitButton.getAttribute("aria-disabled") === "true") return;
+
+      //   this.handleErrorMessage();
+
+      //   this.submitButton.setAttribute("aria-disabled", true);
+      //   this.submitButton.classList.add("loading");
+      //   this.querySelector(".loading-overlay__spinner").classList.remove(
+      //     "hidden"
+      //   );
+
+      //   const config = fetchConfig("javascript");
+      //   config.headers["X-Requested-With"] = "XMLHttpRequest";
+      //   delete config.headers["Content-Type"];
+
+      //   const formData = new FormData(this.form);
+      //   if (this.cart) {
+      //     formData.append(
+      //       "sections",
+      //       this.cart.getSectionsToRender().map((section) => section.id)
+      //     );
+      //     formData.append("sections_url", window.location.pathname);
+      //     this.cart.setActiveElement(document.activeElement);
+      //   }
+      //   config.body = formData;
+
+      //   fetch(`${routes.cart_add_url}`, config)
+      //     .then((response) => response.json())
+      //     .then((response) => {
+      //       if (response.status) {
+      //         publish(PUB_SUB_EVENTS.cartError, {
+      //           source: "product-form",
+      //           productVariantId: formData.get("id"),
+      //           errors: response.errors || response.description,
+      //           message: response.message,
+      //         });
+      //         this.handleErrorMessage(response.description);
+
+      //         const soldOutMessage =
+      //           this.submitButton.querySelector(".sold-out-message");
+      //         if (!soldOutMessage) return;
+      //         this.submitButton.setAttribute("aria-disabled", true);
+      //         this.submitButton.querySelector("span").classList.add("hidden");
+      //         soldOutMessage.classList.remove("hidden");
+      //         this.error = true;
+      //         return;
+      //       } else if (!this.cart) {
+      //         window.location = window.routes.cart_url;
+      //         return;
+      //       }
+
+      //       if (!this.error)
+      //         publish(PUB_SUB_EVENTS.cartUpdate, {
+      //           source: "product-form",
+      //           productVariantId: formData.get("id"),
+      //           cartData: response,
+      //         });
+      //       this.error = false;
+      //       const quickAddModal = this.closest("quick-add-modal");
+      //       if (quickAddModal) {
+      //         document.body.addEventListener(
+      //           "modalClosed",
+      //           () => {
+      //             setTimeout(() => {
+      //               this.cart.renderContents(response);
+      //             });
+      //           },
+      //           { once: true }
+      //         );
+      //         quickAddModal.hide(true);
+      //       } else {
+      //         this.cart.renderContents(response);
+      //         this.addMysteryTeeToCart();z
+      //       }
+      //     })
+      //     .catch((e) => {
+      //       console.error(e);
+      //     })
+      //     .finally(() => {
+      //       this.submitButton.classList.remove("loading");
+      //       if (this.cart && this.cart.classList.contains("is-empty"))
+      //         this.cart.classList.remove("is-empty");
+      //       if (!this.error) this.submitButton.removeAttribute("aria-disabled");
+      //       this.querySelector(".loading-overlay__spinner").classList.add(
+      //         "hidden"
+      //       );
+      //     });
+      // }
+
       onSubmitHandler(evt) {
         evt.preventDefault();
         if (this.submitButton.getAttribute("aria-disabled") === "true") return;
 
         this.handleErrorMessage();
-
         this.submitButton.setAttribute("aria-disabled", true);
         this.submitButton.classList.add("loading");
         this.querySelector(".loading-overlay__spinner").classList.remove(
@@ -35,69 +124,48 @@ if (!customElements.get("product-form")) {
         config.headers["X-Requested-With"] = "XMLHttpRequest";
         delete config.headers["Content-Type"];
 
-        const formData = new FormData(this.form);
-        if (this.cart) {
-          formData.append(
-            "sections",
-            this.cart.getSectionsToRender().map((section) => section.id)
-          );
-          formData.append("sections_url", window.location.pathname);
-          this.cart.setActiveElement(document.activeElement);
-        }
-        config.body = formData;
+        const baseFormData = new FormData(this.form);
+        const baseItemId = baseFormData.get("id");
 
-        fetch(`${routes.cart_add_url}`, config)
-          .then((response) => response.json())
+        fetch("/cart.js")
+          .then((res) => res.json())
+          .then((cart) => {
+            return this.prepareCombinedFormData(cart, baseItemId).then(
+              (finalFormData) => {
+                if (this.cart) {
+                  finalFormData.append(
+                    "sections",
+                    this.cart.getSectionsToRender().map((section) => section.id)
+                  );
+                  finalFormData.append(
+                    "sections_url",
+                    window.location.pathname
+                  );
+                  this.cart.setActiveElement(document.activeElement);
+                }
+
+                config.body = finalFormData;
+                return fetch(`${routes.cart_add_url}`, config);
+              }
+            );
+          })
+          .then((res) => res.json())
           .then((response) => {
             if (response.status) {
-              publish(PUB_SUB_EVENTS.cartError, {
-                source: "product-form",
-                productVariantId: formData.get("id"),
-                errors: response.errors || response.description,
-                message: response.message,
-              });
               this.handleErrorMessage(response.description);
-
-              const soldOutMessage =
-                this.submitButton.querySelector(".sold-out-message");
-              if (!soldOutMessage) return;
-              this.submitButton.setAttribute("aria-disabled", true);
-              this.submitButton.querySelector("span").classList.add("hidden");
-              soldOutMessage.classList.remove("hidden");
               this.error = true;
               return;
-            } else if (!this.cart) {
+            }
+
+            this.error = false;
+            if (!this.cart) {
               window.location = window.routes.cart_url;
               return;
             }
 
-            if (!this.error)
-              publish(PUB_SUB_EVENTS.cartUpdate, {
-                source: "product-form",
-                productVariantId: formData.get("id"),
-                cartData: response,
-              });
-            this.error = false;
-            const quickAddModal = this.closest("quick-add-modal");
-            if (quickAddModal) {
-              document.body.addEventListener(
-                "modalClosed",
-                () => {
-                  setTimeout(() => {
-                    this.cart.renderContents(response);
-                  });
-                },
-                { once: true }
-              );
-              quickAddModal.hide(true);
-            } else {
-              this.cart.renderContents(response);
-              this.addMysteryTeeToCart();
-            }
+            this.cart.renderContents(response);
           })
-          .catch((e) => {
-            console.error(e);
-          })
+          .catch(console.error)
           .finally(() => {
             this.submitButton.classList.remove("loading");
             if (this.cart && this.cart.classList.contains("is-empty"))
@@ -107,6 +175,56 @@ if (!customElements.get("product-form")) {
               "hidden"
             );
           });
+      }
+
+
+
+      
+      prepareCombinedFormData(cart, baseItemId) {
+        const alreadyHasMysteryTee = cart.items.some(
+          (item) => item.handle === "sunner-mystery-tee"
+        );
+
+        if (!alreadyHasMysteryTee) {
+          return fetch("/products/sunner-mystery-tee.js")
+            .then((res) => {
+              if (!res.ok) {
+                console.warn("Mystery Tee product not found.");
+                return null;
+              }
+              return res.json();
+            })
+            .then((product) => {
+              if (!product || !product.tags.includes("freegift")) {
+                console.warn("Mystery Tee does not have required tag.");
+                return null;
+              }
+
+              const matchingVariant =
+                product.variants.find((v) =>
+                  v.title.toLowerCase().includes("medium")
+                ) || product.variants[0];
+
+              if (!matchingVariant) {
+                console.warn("No valid variant found for Mystery Tee.");
+                return null;
+              }
+
+              const combined = new FormData();
+              combined.append("items[0][id]", baseItemId);
+              combined.append("items[0][quantity]", 1);
+              combined.append("items[1][id]", matchingVariant.id);
+              combined.append("items[1][quantity]", 1);
+              return combined;
+            })
+            .catch((err) => {
+              console.error("Error fetching or processing Mystery Tee:", err);
+              return null;
+            });
+        }
+
+        // Just use the base form as-is if Mystery Tee already in cart
+        return Promise.resolve(new FormData(this.form));
       }
 
       handleErrorMessage(errorMessage = false) {

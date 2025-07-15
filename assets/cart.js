@@ -384,6 +384,15 @@ class CartItems extends HTMLElement {
         this.disableLoading(lineIndex);
       });
   }
+
+
+
+
+
+
+
+
+  
 }
 
 customElements.define("cart-items", CartItems);
