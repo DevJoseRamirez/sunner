@@ -8,6 +8,14 @@
         "announcement-bar-0": {
           "type": "announcement",
           "settings": {
+            "text": "FREE MYSTERY TEE WITH EVERY ORDER",
+            "link": ""
+          }
+        },
+        "announcement_pfzaYR": {
+          "type": "announcement",
+          "disabled": true,
+          "settings": {
             "text": "ALL TEES RESTOCKED | 20% OFF SITEWIDE",
             "link": ""
           }
@@ -23,9 +31,9 @@
       },
       "block_order": [
         "announcement-bar-0",
+        "announcement_pfzaYR",
         "75af0f47-818d-4fd7-b865-2f92148faf43"
       ],
-      "disabled": true,
       "settings": {
         "color_scheme": "accent-1",
         "show_line_separator": true,

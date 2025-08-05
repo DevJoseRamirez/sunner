@@ -12,6 +12,7 @@
       "type": "main-collection-product-grid",
       "settings": {
         "products_per_page": 16,
+        "show_variants": true,
         "columns_desktop": 4,
         "image_ratio": "portrait",
         "image_shape": "default",
