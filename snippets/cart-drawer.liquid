@@ -36,6 +36,8 @@
       aria-label="{{ 'sections.cart.title' | t }}"
       tabindex="-1"
     >
+
+
       {%- if cart == empty -%}
         <div class="drawer__inner-empty">
           <div class="cart-drawer__warnings center{% if settings.cart_drawer_collection != blank %} cart-drawer__warnings--has-collection{% endif %}">
@@ -68,6 +70,9 @@
           {%- endif -%}
         </div>
       {%- endif -%}
+
+
+
       <div class="drawer__header">
         <h2 class="drawer__heading">{{ 'sections.cart.title' | t }}</h2>
         <button
@@ -79,6 +84,14 @@
           {% render 'icon-close' %}
         </button>
       </div>
+
+
+
+
+{% render 'cart-progress-bar' %}
+
+
+
       <cart-drawer-items
         {% if cart == empty %}
           class=" is-empty"
@@ -391,6 +404,8 @@
 
 {% endunless %}
 
+{% comment %} {%- unless item.product.handle == 'sunner-mystery-tee' -%} {% endcomment %}
+
 
                               <cart-remove-button
                                 id="CartDrawer-Remove-{{ item.index | plus: 1 }}"
@@ -405,6 +420,9 @@
                                   {% render 'icon-remove' %}
                                 </button>
                               </cart-remove-button>
+{% comment %} {% endunless %}  {% endcomment %}
+
+
                             </div>
                             {%- if has_qty_rules or has_vol_pricing -%}
                               <button

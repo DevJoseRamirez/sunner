@@ -313,7 +313,7 @@ class CartItems extends HTMLElement {
     );
   }
 
-  // MYSTERY TEE
+  // ***MYSTERY TEE
   updateMysteryTeeVariant(lineIndex, newVariantId) {
     if (!newVariantId || isNaN(newVariantId)) {
       console.warn("Invalid variant ID for mystery tee");
@@ -384,15 +384,6 @@ class CartItems extends HTMLElement {
         this.disableLoading(lineIndex);
       });
   }
-
-
-
-
-
-
-
-
-  
 }
 
 customElements.define("cart-items", CartItems);
@@ -418,3 +409,242 @@ if (!customElements.get("cart-note")) {
     }
   );
 }
+
+// ─────────────────────────────────────────────────────────────────
+// PROGRESS BAR
+// ─────────────────────────────────────────────────────────────────
+(function () {
+  const SELECTOR = ".cart-progress";
+  const el = document.querySelector(SELECTOR);
+  const THRESHOLD = el ? parseInt(el.dataset.threshold, 10) : 5000; // default $50
+
+  function formatMoney(cents) {
+    return `$${(cents / 100).toFixed(2)}`;
+  }
+
+  function updateProgress(cart) {
+    const total = cart.total_price || 0;
+    const remaining = Math.max(0, THRESHOLD - total);
+    const pct = Math.min(100, Math.round((total / THRESHOLD) * 100));
+
+    const wrap = document.querySelector(SELECTOR);
+    if (!wrap) return;
+
+    wrap.querySelector(".cart-progress__remaining").textContent =
+      formatMoney(remaining);
+    wrap.querySelector(".cart-progress__fill").style.width = pct + "%";
+    wrap
+      .querySelector(".cart-progress__bar")
+      .setAttribute("aria-valuenow", pct);
+
+    const label = wrap.querySelector(".cart-progress__label");
+    if (remaining === 0) {
+      label.textContent = "🎉 You’ve unlocked your free gift!";
+    } else {
+      label.innerHTML = `You are <span class="cart-progress__remaining">${formatMoney(
+        remaining
+      )}</span> away from your free gift!`;
+    }
+  }
+
+  function fetchCartProgress() {
+    fetch("/cart.js", { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then(updateProgress)
+      .catch(() => {});
+  }
+
+  document.addEventListener("DOMContentLoaded", fetchCartProgress);
+  document.addEventListener("cart-drawer:open", fetchCartProgress);
+  try {
+    subscribe(PUB_SUB_EVENTS.cartUpdate, fetchCartProgress);
+  } catch (e) {}
+})();
+
+// ─────────────────────────────────────────────────────────────────
+// FREE GIFT AUTO-ADD/REMOVE
+// ─────────────────────────────────────────────────────────────────
+(function () {
+  // 1) Your gift’s variant ID (replace with the actual ID from Shopify).
+  const GIFT_VARIANT_ID = 44986453819588;
+
+  // 2) Read the $50 threshold (in cents) from your progress bar’s data-attribute.
+  const wrap = document.querySelector(".cart-progress");
+  const THRESHOLD = wrap ? parseInt(wrap.dataset.threshold, 10) : 5000;
+
+  // Right alongside your addGift/removeGift/handleFreeGift…
+  async function fetchCartAndHandle() {
+    console.log("fetchCartAndHandle");
+    try {
+      const r = await fetch("/cart.js", { credentials: "same-origin" });
+      const cart = await r.json();
+      return handleFreeGift(cart);
+    } catch {}
+  }
+
+  async function addGift() {
+    console.log("run addition");
+
+    // 1️⃣ Find the right container (drawer vs full-page)
+    const cartItemsEl =
+      document.querySelector("cart-items") ||
+      document.querySelector("cart-drawer-items");
+    console.log("[FreeGift] ▶️ cartItemsEl:", cartItemsEl);
+    if (!cartItemsEl) {
+      console.error(
+        "[FreeGift] No cart-items or cart-drawer-items element found!"
+      );
+    }
+
+    // 2️⃣ Safely build sections array (or leave empty)
+    let sections = [];
+    if (cartItemsEl && typeof cartItemsEl.getSectionsToRender === "function") {
+      try {
+        sections = cartItemsEl.getSectionsToRender().map((s) => s.section);
+      } catch (e) {
+        console.error("[FreeGift] Error getting sections:", e);
+      }
+    }
+    console.log("[FreeGift] ▶️ sections to render:", sections);
+
+    // 3️⃣ Minimal payload to debug API call
+    const payload = {
+      id: GIFT_VARIANT_ID,
+      quantity: 1,
+      // sections, sections_url  ← remove for now
+    };
+    console.log("[FreeGift] ▶️ addGift payload (minimal):", payload);
+
+    const cfg = fetchConfig("javascript");
+    cfg.headers["X-Requested-With"] = "XMLHttpRequest";
+    cfg.headers["Content-Type"] = "application/json";
+    cfg.body = JSON.stringify(payload);
+
+    const response = await fetch(routes.cart_add_url, cfg);
+    console.log(
+      "[FreeGift] fetch response status:",
+      response.status,
+      response.statusText
+    );
+    const json = await response.json();
+    console.log("[FreeGift] 📦 addGift JSON response:", json);
+    return json;
+  }
+
+  // 4) Helper to remove the gift variant.
+  async function removeGift() {
+    console.log("run removal");
+
+    // Find the right cart-items element to extract sections
+    const cartItemsEl =
+      document.querySelector("cart-items") ||
+      document.querySelector("cart-drawer-items");
+    let sections = [];
+    if (cartItemsEl && typeof cartItemsEl.getSectionsToRender === "function") {
+      try {
+        sections = cartItemsEl.getSectionsToRender().map((s) => s.section);
+      } catch (e) {
+        console.error("[FreeGift] Error getting sections for removal:", e);
+      }
+    }
+    console.log("[FreeGift] ▶️ sections to render for removal:", sections);
+
+    // Build the updates payload
+    const payload = {
+      updates: {
+        [GIFT_VARIANT_ID]: 0,
+      },
+      sections,
+      sections_url: window.location.pathname,
+    };
+    console.log("[FreeGift] ▶️ removeGift payload:", payload);
+
+    // Fire the request against the update endpoint
+    const cfg = fetchConfig("javascript");
+    cfg.headers["X-Requested-With"] = "XMLHttpRequest";
+    cfg.headers["Content-Type"] = "application/json";
+    cfg.body = JSON.stringify(payload);
+
+    const response = await fetch(routes.cart_update_url, cfg);
+    console.log(
+      "[FreeGift] removeGift response status:",
+      response.status,
+      response.statusText
+    );
+    const json = await response.json();
+    console.log("[FreeGift] 📦 removeGift JSON response:", json);
+    return json;
+  }
+
+  // 5) Core logic: if cart ≥ threshold & gift missing → add,
+  //                  if cart < threshold & gift present → remove.
+  function handleFreeGift(cart) {
+    console.log("handleFreeGift");
+
+    // 🚨 DEBUG LOGS
+    console.log("[FreeGift] 🔍 cart JSON:", cart);
+    console.log("[FreeGift] 🔢 total_price (¢):", cart.total_price);
+    console.log(
+      "[FreeGift] 📦 items:",
+      cart.items.map((i) => ({
+        id: i.id,
+        variant_id: i.variant_id,
+        quantity: i.quantity,
+        title: i.title,
+      }))
+    );
+    console.log("[FreeGift] 🎯 threshold (¢):", THRESHOLD);
+
+    const total = cart.total_price || 0;
+    const hasGift = cart.items.some((i) => i.variant_id === GIFT_VARIANT_ID);
+    console.log(
+      "[FreeGift] ➡️ hasGift?",
+      hasGift,
+      "total >= threshold?",
+      total >= THRESHOLD
+    );
+
+    if (total >= THRESHOLD && !hasGift) {
+      console.log("[FreeGift] 🛒 Adding gift now");
+      addGift().then((newCart) =>
+        publish(PUB_SUB_EVENTS.cartUpdate, {
+          source: "free-gift-add",
+          cartData: newCart,
+        })
+      );
+    } else if (total < THRESHOLD && hasGift) {
+      console.log("[FreeGift] 🚫 Removing gift now");
+      removeGift().then((newCart) =>
+        publish(PUB_SUB_EVENTS.cartUpdate, {
+          source: "free-gift-remove",
+          cartData: newCart,
+        })
+      );
+    } else {
+      console.log("[FreeGift] ⚖️ No action needed");
+    }
+  }
+
+  // 6) Subscribe **only** to Shopify’s `cart-items` updates,
+  //    so this runs *after* Dawn’s own drawer replacement completes.
+  try {
+    subscribe(PUB_SUB_EVENTS.cartUpdate, (event) => {
+      // Only skip our own gift‐add/remove loops…
+      if (
+        event.source === "free-gift-add" ||
+        event.source === "free-gift-remove"
+      ) {
+        return;
+      }
+      // …and otherwise run gift logic on BOTH:
+      // • product-form (initial add from PDP)
+      // • cart-items   (qty changes in drawer)
+      // handleFreeGift(event.cartData);
+      console.log("fetchCartAndHandle running ");
+      fetchCartAndHandle();
+    });
+  } catch (e) {
+    console.warn("FreeGift: subscription failed", e);
+  }
+  window.handleFreeGift = handleFreeGift;
+})();
