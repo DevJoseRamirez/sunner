@@ -1,3 +1,5 @@
+const GIFT_HANDLE = "sunner-mystery-tee";
+
 class CartRemoveButton extends HTMLElement {
   constructor() {
     super();
@@ -57,12 +59,16 @@ class CartItems extends HTMLElement {
     const lineIndex = parseInt(target.dataset.index, 10);
     const value = target.value;
 
-    // Check if this is the mystery tee selector based on input type and/or class
+    // If this is the free-gift size selector, swap the gift
     if (
-      target.classList.contains("mystery-tee-selector") ||
-      (target.tagName === "SELECT" && target.name === "mystery-tee")
+      target.tagName === "SELECT" &&
+      target.classList.contains("mystery-tee-selector")
     ) {
-      this.updateMysteryTeeVariant(lineIndex, parseInt(value, 10));
+      const newVariantId = parseInt(target.value, 10);
+      console.log("[FreeGift] mystery-tee-selector changed →", newVariantId);
+      this.freeGiftSelectChange(lineIndex, newVariantId);
+      console.log(lineIndex, newVariantId);
+      return;
     } else if (target.type === "number") {
       // Standard quantity change
       this.updateQuantity(
@@ -313,77 +319,85 @@ class CartItems extends HTMLElement {
     );
   }
 
-  // ***MYSTERY TEE
-  updateMysteryTeeVariant(lineIndex, newVariantId) {
+  // ─────────────────────────────────────────────────────────────────
+  // FREE GIFT SELECT CHAGNE
+  // ─────────────────────────────────────────────────────────────────
+  async freeGiftSelectChange(lineIndex, newVariantId) {
     if (!newVariantId || isNaN(newVariantId)) {
       console.warn("Invalid variant ID for mystery tee");
       return;
     }
 
-    // Show loading overlay on the targeted line
+    // Show loading overlay on that line
     this.enableLoading(lineIndex);
 
-    const removeBody = JSON.stringify({
-      line: lineIndex,
-      quantity: 0,
-      sections: this.getSectionsToRender().map((section) => section.section),
-      sections_url: window.location.pathname,
-    });
-
-    fetch(`${routes.cart_change_url}`, { ...fetchConfig(), body: removeBody })
-      .then((removeRes) => removeRes.text())
-      .then(() => {
-        const addBody = JSON.stringify({
-          id: newVariantId,
-          quantity: 1,
-          sections: this.getSectionsToRender().map(
-            (section) => section.section
-          ),
+    try {
+      // 1) Find the actual gift line in the cart by product handle
+      const cart = await fetch("/cart.js", { credentials: "same-origin" }).then(
+        (r) => r.json()
+      );
+      const giftIdx = cart.items.findIndex(
+        (i) => i.handle === "sunner-mystery-tee"
+      );
+      if (giftIdx !== -1) {
+        // 2) Remove that gift line
+        const removeBody = JSON.stringify({
+          line: giftIdx + 1,
+          quantity: 0,
+          sections: this.getSectionsToRender().map((s) => s.section),
           sections_url: window.location.pathname,
         });
-
-        return fetch(`${routes.cart_add_url}`, {
+        await fetch(routes.cart_change_url, {
           ...fetchConfig(),
-          body: addBody,
+          body: removeBody,
         });
-      })
-      .then((addRes) => addRes.text())
-      .then((state) => {
-        const parsedState = JSON.parse(state);
-        this.classList.toggle("is-empty", parsedState.item_count === 0);
+      }
 
-        this.getSectionsToRender().forEach((section) => {
-          const elementToReplace =
-            document
-              .getElementById(section.id)
-              .querySelector(section.selector) ||
-            document.getElementById(section.id);
-          elementToReplace.innerHTML = this.getSectionInnerHTML(
-            parsedState.sections[section.section],
-            section.selector
-          );
-        });
-
-        publish(PUB_SUB_EVENTS.cartUpdate, {
-          source: "mystery-tee-update",
-          cartData: parsedState,
-          variantId: newVariantId,
-        });
-      })
-      .catch(() => {
-        this.querySelectorAll(".loading-overlay").forEach((overlay) =>
-          overlay.classList.add("hidden")
-        );
-        const errors =
-          document.getElementById("cart-errors") ||
-          document.getElementById("CartDrawer-CartErrors");
-        if (errors) errors.textContent = window.cartStrings.error;
-      })
-      .finally(() => {
-        // Hide loading overlay after all is done
-        this.disableLoading(lineIndex);
+      // 3) Now add the newly selected size
+      const addBody = JSON.stringify({
+        id: newVariantId,
+        quantity: 1,
+        sections: this.getSectionsToRender().map((s) => s.section),
+        sections_url: window.location.pathname,
       });
+      const addRes = await fetch(routes.cart_add_url, {
+        ...fetchConfig(),
+        body: addBody,
+      });
+      const parsed = await addRes.json();
+
+      // new “one-and-done” full-drawer render
+      const drawer =
+        document.querySelector("cart-drawer") ||
+        document.querySelector("cart-notification");
+      if (drawer && typeof drawer.renderContents === "function") {
+        drawer.renderContents(parsed);
+      } else {
+        // fallback to your existing manual sections if needed
+        this.classList.toggle("is-empty", parsed.item_count === 0);
+        this.getSectionsToRender().forEach(({ id, selector }) => {
+          const target =
+            document.getElementById(id).querySelector(selector) ||
+            document.getElementById(id);
+          target.innerHTML = new DOMParser()
+            .parseFromString(parsed.sections[id], "text/html")
+            .querySelector(selector).innerHTML;
+        });
+      }
+
+      publish(PUB_SUB_EVENTS.cartUpdate, {
+        source: "mystery-tee-update",
+        cartData: parsed,
+        variantId: newVariantId,
+      });
+    } catch (err) {
+      console.error("updateFreegift error:", err);
+    } finally {
+      this.disableLoading(lineIndex);
+    }
   }
+
+  // ─────────────────────────────────────────────────────────────────
 }
 
 customElements.define("cart-items", CartItems);
@@ -466,7 +480,8 @@ if (!customElements.get("cart-note")) {
 // ─────────────────────────────────────────────────────────────────
 (function () {
   // 1) Your gift’s variant ID (replace with the actual ID from Shopify).
-  const GIFT_VARIANT_ID = 44986453819588;
+  const GIFT_HANDLE = "sunner-mystery-tee";
+  const DEFAULT_VARIANT = 44986453819588;
 
   // 2) Read the $50 threshold (in cents) from your progress bar’s data-attribute.
   const wrap = document.querySelector(".cart-progress");
@@ -484,95 +499,61 @@ if (!customElements.get("cart-note")) {
 
   async function addGift() {
     console.log("run addition");
-
-    // 1️⃣ Find the right container (drawer vs full-page)
-    const cartItemsEl =
-      document.querySelector("cart-items") ||
-      document.querySelector("cart-drawer-items");
-    console.log("[FreeGift] ▶️ cartItemsEl:", cartItemsEl);
-    if (!cartItemsEl) {
-      console.error(
-        "[FreeGift] No cart-items or cart-drawer-items element found!"
-      );
-    }
-
-    // 2️⃣ Safely build sections array (or leave empty)
-    let sections = [];
-    if (cartItemsEl && typeof cartItemsEl.getSectionsToRender === "function") {
-      try {
-        sections = cartItemsEl.getSectionsToRender().map((s) => s.section);
-      } catch (e) {
-        console.error("[FreeGift] Error getting sections:", e);
-      }
-    }
-    console.log("[FreeGift] ▶️ sections to render:", sections);
-
-    // 3️⃣ Minimal payload to debug API call
     const payload = {
-      id: GIFT_VARIANT_ID,
+      id: DEFAULT_VARIANT,
       quantity: 1,
-      // sections, sections_url  ← remove for now
     };
-    console.log("[FreeGift] ▶️ addGift payload (minimal):", payload);
-
+    console.log("[FreeGift] ▶️ addGift payload:", payload);
     const cfg = fetchConfig("javascript");
     cfg.headers["X-Requested-With"] = "XMLHttpRequest";
     cfg.headers["Content-Type"] = "application/json";
     cfg.body = JSON.stringify(payload);
-
-    const response = await fetch(routes.cart_add_url, cfg);
-    console.log(
-      "[FreeGift] fetch response status:",
-      response.status,
-      response.statusText
-    );
-    const json = await response.json();
-    console.log("[FreeGift] 📦 addGift JSON response:", json);
+    const res = await fetch(routes.cart_add_url, cfg);
+    console.log("[FreeGift] addGift status:", res.status);
+    const json = await res.json();
+    console.log("[FreeGift] 📦 addGift JSON:", json);
     return json;
   }
 
   // 4) Helper to remove the gift variant.
   async function removeGift() {
     console.log("run removal");
+    // 1) Grab the real cart
+    const cart = await fetch("/cart.js", { credentials: "same-origin" }).then(
+      (r) => r.json()
+    );
+    console.log("[FreeGift] items before removal:", cart.items);
 
-    // Find the right cart-items element to extract sections
-    const cartItemsEl =
-      document.querySelector("cart-items") ||
-      document.querySelector("cart-drawer-items");
-    let sections = [];
-    if (cartItemsEl && typeof cartItemsEl.getSectionsToRender === "function") {
-      try {
-        sections = cartItemsEl.getSectionsToRender().map((s) => s.section);
-      } catch (e) {
-        console.error("[FreeGift] Error getting sections for removal:", e);
-      }
+    // 2) Build updates: zero out every gift variant
+    const updates = cart.items
+      .filter((i) => i.handle === GIFT_HANDLE)
+      .reduce((m, i) => ((m[i.variant_id] = 0), m), {});
+
+    if (!Object.keys(updates).length) {
+      console.log("[FreeGift] no gift to remove");
+      return cart;
     }
-    console.log("[FreeGift] ▶️ sections to render for removal:", sections);
 
-    // Build the updates payload
     const payload = {
-      updates: {
-        [GIFT_VARIANT_ID]: 0,
-      },
-      sections,
+      updates,
+      sections: document
+        .querySelector("cart-items")
+        .getSectionsToRender()
+        .map((s) => s.section),
       sections_url: window.location.pathname,
     };
     console.log("[FreeGift] ▶️ removeGift payload:", payload);
+    //  - we dong get this payload log
 
-    // Fire the request against the update endpoint
     const cfg = fetchConfig("javascript");
     cfg.headers["X-Requested-With"] = "XMLHttpRequest";
     cfg.headers["Content-Type"] = "application/json";
     cfg.body = JSON.stringify(payload);
 
-    const response = await fetch(routes.cart_update_url, cfg);
-    console.log(
-      "[FreeGift] removeGift response status:",
-      response.status,
-      response.statusText
-    );
-    const json = await response.json();
-    console.log("[FreeGift] 📦 removeGift JSON response:", json);
+    const res = await fetch(routes.cart_update_url, cfg);
+    console.log("[FreeGift] removeGift status:", res.status);
+    const json = await res.json();
+    console.log("[FreeGift] 📦 removeGift JSON:", json);
     return json;
   }
 
@@ -596,7 +577,9 @@ if (!customElements.get("cart-note")) {
     console.log("[FreeGift] 🎯 threshold (¢):", THRESHOLD);
 
     const total = cart.total_price || 0;
-    const hasGift = cart.items.some((i) => i.variant_id === GIFT_VARIANT_ID);
+    const giftItems = cart.items.filter((i) => i.handle === GIFT_HANDLE);
+    const hasGift = giftItems.length > 0;
+
     console.log(
       "[FreeGift] ➡️ hasGift?",
       hasGift,
@@ -625,8 +608,9 @@ if (!customElements.get("cart-note")) {
     }
   }
 
-  // 6) Subscribe **only** to Shopify’s `cart-items` updates,
-  //    so this runs *after* Dawn’s own drawer replacement completes.
+  document.addEventListener("DOMContentLoaded", fetchCartAndHandle);
+  document.addEventListener("cart-drawer:open", fetchCartAndHandle);
+
   try {
     subscribe(PUB_SUB_EVENTS.cartUpdate, (event) => {
       // Only skip our own gift‐add/remove loops…
@@ -636,10 +620,6 @@ if (!customElements.get("cart-note")) {
       ) {
         return;
       }
-      // …and otherwise run gift logic on BOTH:
-      // • product-form (initial add from PDP)
-      // • cart-items   (qty changes in drawer)
-      // handleFreeGift(event.cartData);
       console.log("fetchCartAndHandle running ");
       fetchCartAndHandle();
     });
