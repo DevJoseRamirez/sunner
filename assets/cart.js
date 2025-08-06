@@ -1,4 +1,28 @@
 const GIFT_HANDLE = "sunner-mystery-tee";
+function getCartSectionsToRender() {
+  return [
+    {
+      id: "main-cart-items",
+      section: document.getElementById("main-cart-items")?.dataset.id,
+      selector: ".js-contents",
+    },
+    {
+      id: "cart-icon-bubble",
+      section: "cart-icon-bubble",
+      selector: ".shopify-section",
+    },
+    {
+      id: "cart-live-region-text",
+      section: "cart-live-region-text",
+      selector: ".shopify-section",
+    },
+    {
+      id: "main-cart-footer",
+      section: document.getElementById("main-cart-footer")?.dataset.id,
+      selector: ".js-contents",
+    },
+  ];
+}
 
 class CartRemoveButton extends HTMLElement {
   constructor() {
@@ -534,14 +558,21 @@ if (!customElements.get("cart-note")) {
       return cart;
     }
 
+    console.log(
+      "[FreeGift] all item handles:",
+      cart.items.map((i) => i.handle)
+    );
+    console.log(
+      "[FreeGift] all variant_ids:",
+      cart.items.map((i) => i.variant_id)
+    );
+
     const payload = {
       updates,
-      sections: document
-        .querySelector("cart-items")
-        .getSectionsToRender()
-        .map((s) => s.section),
+      sections: this.getCartSectionsToRender().map((section) => section.section),
       sections_url: window.location.pathname,
     };
+
     console.log("[FreeGift] ▶️ removeGift payload:", payload);
     //  - we dong get this payload log
 
