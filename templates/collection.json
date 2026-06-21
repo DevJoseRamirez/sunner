@@ -1,35 +1,3 @@
-<<<<<<< HEAD
-{
-  "sections": {
-    "banner": {
-      "type": "main-collection-banner",
-      "settings": {
-        "show_collection_description": true,
-        "show_collection_image": false,
-        "color_scheme": "background-1"
-      }
-    },
-    "product-grid": {
-      "type": "main-collection-product-grid",
-      "settings": {
-        "products_per_page": 16,
-        "show_variants": true,
-        "columns_desktop": 4,
-        "image_ratio": "portrait",
-        "image_shape": "default",
-        "show_product_count": false,
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_color_count": true,
-        "show_rating": false,
-        "enable_quick_add": false,
-        "enable_filtering": true,
-        "filter_type": "drawer",
-        "enable_sorting": true,
-        "columns_mobile": "2",
-        "padding_top": 0,
-        "padding_bottom": 36
-=======
 /*
  * ------------------------------------------------------------
  * IMPORTANT: The contents of this file are auto-generated.
@@ -316,19 +284,13 @@
         "divider": false,
         "full_width": false,
         "rounded": true
->>>>>>> bdc1b2b (theme save push)
       }
     }
   },
   "order": [
-<<<<<<< HEAD
-    "banner",
-    "product-grid"
-=======
     "main-collection-banner",
     "collection_list_FpPGdQ",
     "main-collection",
     "recently-viewed"
->>>>>>> bdc1b2b (theme save push)
   ]
 }

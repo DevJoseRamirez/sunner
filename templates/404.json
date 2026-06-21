@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-{
-  "sections": {
-    "main": {
-      "type": "main-404",
-      "settings": {}
-    }
-  },
-  "order": [
-    "main"
-  ]
-}
-=======
 /*
  * ------------------------------------------------------------
  * IMPORTANT: The contents of this file are auto-generated.
@@ -49,4 +36,3 @@
     "empty-space"
   ]
 }
->>>>>>> bdc1b2b (theme save push)

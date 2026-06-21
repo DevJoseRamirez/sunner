@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-{
-  "sections": {
-    "main": {
-      "type": "main-page",
-      "settings": {
-        "padding_top": 28,
-        "padding_bottom": 28
-=======
 /*
  * ------------------------------------------------------------
  * IMPORTANT: The contents of this file are auto-generated.
@@ -30,17 +21,10 @@
         "divider": false,
         "narrow": true,
         "rounded": false
->>>>>>> bdc1b2b (theme save push)
       }
     }
   },
   "order": [
-<<<<<<< HEAD
-    "main"
-  ]
-}
-=======
     "main-page"
   ]
 }
->>>>>>> bdc1b2b (theme save push)

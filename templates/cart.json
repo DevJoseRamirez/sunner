@@ -1,33 +1,3 @@
-<<<<<<< HEAD
-{
-  "sections": {
-    "cart-items": {
-      "type": "main-cart-items",
-      "settings": {
-        "padding_top": 36,
-        "padding_bottom": 36
-      }
-    },
-    "cart-footer": {
-      "type": "main-cart-footer",
-      "blocks": {
-        "subtotal": {
-          "type": "subtotal",
-          "settings": {}
-        },
-        "buttons": {
-          "type": "buttons",
-          "settings": {}
-        }
-      },
-      "block_order": [
-        "subtotal",
-        "buttons"
-      ],
-      "settings": {
-        "padding_top": 20,
-        "padding_bottom": 40
-=======
 /*
  * ------------------------------------------------------------
  * IMPORTANT: The contents of this file are auto-generated.
@@ -113,19 +83,11 @@
         "divider": false,
         "full_width": false,
         "rounded": false
->>>>>>> bdc1b2b (theme save push)
       }
     }
   },
   "order": [
-<<<<<<< HEAD
-    "cart-items",
-    "cart-footer"
-  ]
-}
-=======
     "main",
     "recently-viewed"
   ]
 }
->>>>>>> bdc1b2b (theme save push)

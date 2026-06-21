@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-<div class="{% if section.settings.include_margins %}page-width{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-  {%- for block in section.blocks -%}
-    {% render block %}
-  {%- endfor -%}
-=======
 <style>
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
@@ -18,22 +12,11 @@
       {% render block %}
     {%- endfor -%}
   </div>
->>>>>>> bdc1b2b (theme save push)
 </div>
 
 {% schema %}
 {
   "name": "t:sections.apps.name",
-<<<<<<< HEAD
-  "tag": "section",
-  "class": "section",
-  "settings": [
-    {
-      "type": "checkbox",
-      "id": "include_margins",
-      "default": true,
-      "label": "t:sections.apps.settings.include_margins.label"
-=======
   "settings": [
     {
       "type": "header",
@@ -121,7 +104,6 @@
       "id": "rounded",
       "default": false,
       "label": "t:sections.global.settings.rounded.label"
->>>>>>> bdc1b2b (theme save push)
     }
   ],
   "blocks": [
@@ -131,11 +113,6 @@
   ],
   "presets": [
     {
-<<<<<<< HEAD
-      "name": "t:sections.apps.presets.name"
-    }
-  ]
-=======
       "name": "t:sections.apps.name"
     }
   ],
@@ -144,6 +121,5 @@
       "custom.overlay"
     ]
   }
->>>>>>> bdc1b2b (theme save push)
 }
 {% endschema %}

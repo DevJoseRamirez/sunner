@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-{%- render 'cart-drawer' -%}
-=======
 {%- if request.page_type != 'cart' and settings.cart_type == 'drawer' -%}
   <script src="{{ 'cart.js' | asset_url }}" defer></script>
   {%- if settings.gift_wrap_product != blank and settings.gift_wrap_product.available -%}
@@ -978,4 +975,3 @@
   }
 }
 {% endschema %}
->>>>>>> bdc1b2b (theme save push)

@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-{
-  "sections": {
-    "main": {
-      "type": "main-article",
-      "blocks": {
-        "featured_image": {
-          "type": "featured_image",
-          "settings": {
-            "image_height": "adapt"
-=======
 /*
  * ------------------------------------------------------------
  * IMPORTANT: The contents of this file are auto-generated.
@@ -28,42 +17,11 @@
           "settings": {
             "height": 68,
             "height_mobile": 0
->>>>>>> bdc1b2b (theme save push)
           }
         },
         "title": {
           "type": "title",
           "settings": {
-<<<<<<< HEAD
-            "blog_show_date": true,
-            "blog_show_author": false
-          }
-        },
-        "share": {
-          "type": "share",
-          "settings": {
-            "share_label": "Share"
-          }
-        },
-        "content": {
-          "type": "content",
-          "settings": {}
-        }
-      },
-      "block_order": [
-        "featured_image",
-        "title",
-        "share",
-        "content"
-      ],
-      "settings": {}
-    }
-  },
-  "order": [
-    "main"
-  ]
-}
-=======
             "title_size": "title-lg tracking-heading",
             "show_tags": true,
             "show_date": true,
@@ -181,4 +139,3 @@
     "blog-posts"
   ]
 }
->>>>>>> bdc1b2b (theme save push)

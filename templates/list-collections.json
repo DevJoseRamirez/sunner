@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /*
  * ------------------------------------------------------------
  * IMPORTANT: The contents of this file are auto-generated.
@@ -9,19 +7,11 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
->>>>>>> bdc1b2b (theme save push)
 {
   "sections": {
     "main": {
       "type": "main-list-collections",
       "settings": {
-<<<<<<< HEAD
-        "title": "Collections",
-        "sort": "alphabetical",
-        "image_ratio": "square",
-        "columns_desktop": 3,
-        "columns_mobile": "2"
-=======
         "display_type": "all",
         "sort": "alphabetical",
         "card_style": "card",
@@ -39,7 +29,6 @@
         "divider": false,
         "full_width": false,
         "rounded": false
->>>>>>> bdc1b2b (theme save push)
       }
     }
   },
