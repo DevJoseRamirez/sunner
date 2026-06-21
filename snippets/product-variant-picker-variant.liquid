@@ -1,0 +1,394 @@
+{%- doc -%}
+  Renders an isolated variant picker form for bundle products with customizable selection interfaces.
+
+  Creates a self-contained form for selecting and adding product variants to bundles with inventory awareness.
+
+  @param {object} product - Shopify product object with variants and option data
+  @param {string} product_id - Unique product identifier for element targeting
+  @param {string} section_id - Section identifier for form namespacing
+  @param {string} [image_ratio] - Swatch image aspect ratio
+  @param {string} [image_ratio_mobile] - Mobile swatch image aspect ratio
+  @param {boolean} [image_fill] - Fill vs contain swatch images
+  @param {boolean} [show_variant_labels] - Show variant label
+  @param {object} [size_chart] - Shopify page object for size chart
+  @param {string} [context] - Context identifier for ID generation
+  @param {string} [shopify_attributes] - Shopify-specific attributes
+{%- enddoc -%}
+
+{%- capture _variant_map -%}
+[
+{%- for v in product.variants -%}
+  {%- assign media_id = v.featured_media.id | default: v.image.id -%}
+  {%- assign img_src = '' -%}
+  {%- if v.featured_media and v.featured_media.preview_image -%}
+    {%- assign img_src = v.featured_media.preview_image | image_url: width: 800 -%}
+  {%- elsif v.image -%}
+    {%- assign img_src = v.image | image_url: width: 800 -%}
+  {%- endif -%}
+  {
+    "id": {{ v.id }},
+    "available": {{ v.available | json }},
+    "options": {{ v.options | json }},
+    "featured_media_id": {{ media_id | default: 0 }},
+    "image": {{ img_src | json }}
+  }{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+{%- endcapture -%}
+
+<variant-picker
+  id="VariantPicker-{{ section_id }}-{{ product_id }}{% if context == 'bundle' %}-variant{% endif %}"
+  class="variant-picker grid gap-5{% if context == 'bundle' %} overflow-hidden{% endif %} no-js-hidden"
+  {{ shopify_attributes }}
+>
+  {%- for option in product.options_with_values -%}
+    {%- liquid
+      assign is_color = false
+      assign swatch_trigger_list = 'products.general.color_swatch_trigger' | t | downcase | split: ','
+      assign downcased_option = option.name | downcase
+      for trigger in swatch_trigger_list
+        assign swatch_trigger = trigger | strip
+        if downcased_option contains swatch_trigger
+          assign is_color = true
+        elsif swatch_trigger == 'color' and downcased_option contains 'colour'
+          assign is_color = true
+        endif
+
+        if is_color == true
+          break
+        endif
+      endfor
+
+      assign is_size = false
+      if size_chart != blank
+        assign size_trigger = 'products.general.size_trigger' | t | downcase
+        assign downcased_option = option.name | downcase
+        if downcased_option contains size_trigger
+          assign is_size = true
+        endif
+      endif
+
+      assign option_index_0 = forloop.index0
+    -%}
+
+    <fieldset
+      class="js product-form__input variant-input-wrapper relative"
+      data-option-index="option{{ forloop.index }}"
+      data-option-slug="{{ option.name | handleize }}"
+    >
+      <legend class="sr-only">{{ option.name }}</legend>
+
+      <div class="form__label flex items-center justify-between gap-2 w-full">
+        {%- if show_variant_labels -%}
+          <div class="flex gap-2">
+            {{- option.name -}}:
+            <span class="font-medium" id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if is_size -%}
+          <div class="flex items-center gap-2">
+            {%- render 'icon', icon: 'ruler', size: 'xs', class: 'stroke-1' -%}
+            <button
+              type="button"
+              class="link text-sm leading-tight cursor-pointer"
+              aria-controls="SizeChart-{{ section_id }}-{{ product_id }}"
+              aria-expanded="false"
+            >
+              {{- 'products.general.size_chart' | t -}}
+            </button>
+
+            <x-modal
+              id="SizeChart-{{ section_id }}-{{ product_id }}"
+              class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none"
+              role="dialog"
+              aria-modal="true"
+              aria-label="{{ size_chart.title | escape }}"
+              hidden
+            >
+              <overlay-element
+                class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none"
+                aria-controls="SizeChart-{{ section_id }}-{{ product_id }}"
+                aria-expanded="false"
+              ></overlay-element>
+
+              <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
+                <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative" tabindex="0">
+                  <span class="drawer__title heading title-md">{{ size_chart.title | escape }}</span>
+                  <button
+                    class="button button--secondary button--close drawer__close hidden sm:flex items-center justify-center"
+                    type="button"
+                    is="hover-button"
+                    aria-controls="SizeChart-{{ section_id }}-{{ product_id }}"
+                    aria-expanded="false"
+                    aria-label="{{ 'general.accessibility.close' | t | escape }}"
+                  >
+                    <span class="btn-fill" data-fill></span>
+                    <span class="btn-text">
+                      {%- render 'icon', icon: 'close', size: 'sm' -%}
+                    </span>
+                  </button>
+                </gesture-element>
+
+                <div class="drawer__content opacity-0 invisible flex flex-col h-full grow shrink">
+                  <div class="drawer__scrollable relative flex flex-col gap-5 md:gap-7 grow shrink">
+                    <div class="rte text-base md:text-lg">{{ size_chart.content }}</div>
+                  </div>
+                </div>
+              </div>
+            </x-modal>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- capture swatchs_content -%}
+        {%- for value in option.values -%}
+          <li>
+            <magnet-element class="block">
+              <input
+                type="radio"
+                class="sr-only{% unless value.available %} disabled{% endunless %}"
+                id="{{ section_id }}-{{ product_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
+                name="{{ option.name }}-{{ section_id }}-{{ product_id }}"
+                value="{{ value | escape }}"
+                {% if option.selected_value == value %}checked{% endif %}
+                {% if value.product_url != blank and value.product_url != product.url %}data-product-url="{{ value.variant.url | default: value.product_url }}"{% endif %}
+                data-option-value="{{ value | escape }}"
+                data-option-value-id="{{ value.id }}"
+                align-selected=".scroll-area"
+              />
+
+              {%- if is_color or value.swatch != blank -%}
+                {%- liquid
+                  if value.swatch == blank
+                    assign file_extension = 'png'
+                    assign file_name = value | handle | append: '.' | append: file_extension
+                    assign swatch_fallback = value | split: ' ' | last | handle
+                    assign swatch_fallback_override = false
+
+                    if settings.swatch_config != blank
+                      assign value_downcase = value | downcase
+                      assign swatch_config = settings.swatch_config | newline_to_br | split: '<br />'
+                      for swatch in swatch_config
+                        assign swatch_parts = swatch | strip | split: ':'
+                        assign swatch_name = swatch_parts.first | downcase | strip
+
+                        if swatch_name == value_downcase
+                          assign swatch_value = swatch_parts.last | strip
+                          if swatch_value contains '#'
+                            assign swatch_fallback = swatch_value
+                            assign swatch_fallback_override = true
+                          else
+                            assign file_name = swatch_value
+                          endif
+                          break
+                        endif
+                      endfor
+                    endif
+
+                    assign swatch_image = blank
+                    if images[file_name] != blank
+                      assign swatch_image = images[file_name] | image_url: width: 72
+                    elsif file_name contains '//cdn.shopify.com/'
+                      assign swatch_image = file_name
+                    endif
+                  else
+                    assign swatch_image = blank
+                    assign swatch_fallback = value | split: ' ' | last | handle
+                    if value.swatch.image
+                      assign swatch_image = value.swatch.image | image_url: width: 72
+                      assign swatch_fallback_override = false
+                    elsif value.swatch.color
+                      assign swatch_fallback = value.swatch.color
+                    endif
+                  endif
+
+                  for variant in product.variants
+                    assign variant_value = variant.options[option_index_0]
+                    if variant_value contains value and variant.image
+                      assign swatch_image = variant.image | image_url: width: 72
+                      assign swatch_fallback_override = false
+                      break
+                    endif
+                  endfor
+                -%}
+
+                <label
+                  for="{{ section_id }}-{{ product_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
+                  class="color-swatch{% if swatch_image != blank %} with-image{% endif %} cursor-pointer block relative{% if image_ratio %} aspect-{{ image_ratio }} mobile:aspect-{{ image_ratio_mobile }}{% unless image_fill %} aspect-contain{% endunless %}{% endif %}"
+                  title="{{ value | escape }}"
+                  style="--swatch-background: {{ swatch_fallback }};{% if swatch_fallback_override == false and swatch_image != blank %}--swatch-background-image: url({{ swatch_image }});{% endif %}"
+                >
+                  <span class="sr-only">{{ value | escape }}</span>
+                  {%- unless context == 'bundle' -%}
+                    <span class="tooltip opacity-0 pointer-events-none text-xs rounded-full z-10">{{ value | escape }}</span>
+                  {%- endunless -%}
+                </label>
+              {%- else -%}
+                <label
+                  for="{{ section_id }}-{{ product_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
+                  class="label-swatch text-sm font-medium leading-none cursor-pointer block relative"
+                  title="{{ value | escape }}"
+                >
+                  {{- value -}}
+                </label>
+              {%- endif -%}
+            </magnet-element>
+          </li>
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- if context == 'bundle' -%}
+        <scroll-shadow class="product-card__bottom grid overflow-hidden">
+          <ul class="scroll-area swatches swatches--{{ settings.rounded_swatch }} swatches--variant grid justify-start gap-4">
+            {{- swatchs_content -}}
+          </ul>
+          <template>
+            <slot></slot>
+            <s dir="{% render 'direction' %}" style="--t: 0;--b: 0;--l: 0;--r: 0;">
+              <span class="l"></span>
+              <span class="r"></span>
+            </s>
+            <style>
+              :host{display:inline-block;position:relative}:host([hidden]){display:none}
+              s{position:absolute;inset:0;pointer-events:none;{% if settings.card_style == 'card' %}--color-background:var(--color-placeholder){% endif %}}
+              s span{position:absolute;inset-block:0;width:var(--sp-12);opacity:0;transition:opacity var(--animation-short);}
+              s .l{inset-inline-start:0;opacity:var(--l);background:linear-gradient(90deg,rgb(var(--color-background)) 0%,transparent 100%);}
+              s .r{inset-inline-end:0;opacity:var(--r);background:linear-gradient(270deg,rgb(var(--color-background)) 0%,transparent 100%);}
+              s[dir=rtl] :is(.icon-chevron-left,.icon-chevron-right){transform:scaleX(-1);}
+            </style>
+          </template>
+        </scroll-shadow>
+      {%- else -%}
+        <ul class="swatches swatches--{{ settings.rounded_swatch }} swatches--variant flex items-start flex-wrap gap-4">
+          {{- swatchs_content -}}
+        </ul>
+      {%- endif -%}
+    </fieldset>
+  {%- endfor -%}
+
+  <script type="application/json" data-selected-variant>{{ product.selected_or_first_available_variant | json }}</script>
+  <script type="application/json" data-variant-map>{{ _variant_map }}</script>
+
+  <script>
+    (function () {
+      const picker = document.currentScript.closest('variant-picker');
+      if (!picker) return;
+
+      const getVariantMap = function () {
+        const el = picker.querySelector('script[type="application/json"][data-variant-map]');
+        if (!el) return [];
+        try { return JSON.parse(el.textContent || '[]'); } catch (e) { return []; }
+      };
+
+      const getSelectedOptions = function () {
+        const fieldsets = Array.from(picker.querySelectorAll('fieldset[data-option-index]'));
+        return fieldsets.map(function (fs) {
+          const checked = fs.querySelector('input[type="radio"]:checked');
+          return checked ? (checked.value || '').trim() : '';
+        });
+      };
+
+      const findVariant = function (variants, selectedOptions) {
+        for (let i = 0; i < variants.length; i++) {
+          const v = variants[i];
+          if (!v || !Array.isArray(v.options)) continue;
+          if (v.options.length !== selectedOptions.length) continue;
+
+          let ok = true;
+          for (let j = 0; j < selectedOptions.length; j++) {
+            if ((v.options[j] || '').trim() !== (selectedOptions[j] || '').trim()) { ok = false; break; }
+          }
+          if (ok) return v;
+        }
+        return null;
+      };
+
+      const rootSection = function () {
+        return picker.closest('[id^="shopify-section-"]') || document;
+      };
+
+      const findGallery = function (root) {
+        return root.querySelector('media-gallery[id^="ProductGallery-template--"]') || root.querySelector('media-gallery');
+      };
+
+      const clickThumbnailByMediaId = function (gallery, mediaId) {
+        if (!gallery || !mediaId) return false;
+        const btn = gallery.querySelector('media-dots button[data-media-id="' + CSS.escape(String(mediaId)) + '"]');
+        if (!btn) return false;
+        btn.click();
+        return true;
+      };
+
+      const clickThumbnailByImageSrc = function (gallery, imgSrc) {
+        if (!gallery || !imgSrc) return false;
+        const clean = String(imgSrc).split('?')[0];
+        const btns = Array.from(gallery.querySelectorAll('media-dots button'));
+        for (let i = 0; i < btns.length; i++) {
+          const img = btns[i].querySelector('img');
+          const src = img ? (img.getAttribute('src') || '') : '';
+          if (!src) continue;
+          if (src.indexOf(clean) !== -1 || clean.indexOf(src.split('?')[0]) !== -1) {
+            btns[i].click();
+            return true;
+          }
+        }
+        return false;
+      };
+
+      const nudgeSlider = function (gallery) {
+        if (!gallery) return;
+        const next = gallery.querySelector('button[is="next-button"]');
+        const prev = gallery.querySelector('button[is="previous-button"]');
+        if (next && !next.hasAttribute('disabled')) { next.click(); return; }
+        if (prev && !prev.hasAttribute('disabled')) { prev.click(); }
+      };
+
+      const syncForms = function (root, variantId) {
+        if (!variantId) return;
+
+        const forms = Array.from(root.querySelectorAll('form[action="/cart/add"], form[action^="/cart/add"]'));
+        forms.forEach(function (f) {
+          let input = f.querySelector('input[name="id"]');
+          if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'id';
+            f.appendChild(input);
+          }
+          input.value = String(variantId);
+        });
+      };
+
+      const apply = function () {
+        const variants = getVariantMap();
+        const selectedOptions = getSelectedOptions();
+        const v = findVariant(variants, selectedOptions);
+        if (!v) return;
+
+        const root = rootSection();
+        const gallery = findGallery(root);
+
+        syncForms(root, v.id);
+
+        let ok = false;
+        ok = clickThumbnailByMediaId(gallery, v.featured_media_id);
+        if (!ok) ok = clickThumbnailByImageSrc(gallery, v.image);
+        if (!ok) nudgeSlider(gallery);
+      };
+
+      picker.addEventListener('change', function (e) {
+        const t = e.target;
+        if (!t || t.tagName !== 'INPUT' || t.type !== 'radio') return;
+        apply();
+      }, true);
+
+      const init = function () { apply(); };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</variant-picker>

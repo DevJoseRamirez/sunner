@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html class="no-js" lang="{{ request.locale.iso_code }}">
   <head>
@@ -397,4 +398,1206 @@ twq('config','omzf0');
 </script>
 <!-- PF EDT END -->
 </body>
+=======
+{%- capture direction -%}{% render 'direction' %}{%- endcapture -%}
+<!doctype html>
+<html class="no-js{% if request.design_mode %} shopify-design-mode{% endif %}" lang="{{ request.locale.iso_code }}" dir="{{ direction }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_button_background }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    <link rel="stylesheet" href="https://use.typekit.net/cns2tnc.css">
+    {% # theme-check-disable RemoteAsset %}
+    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
+    <link rel="dns-prefetch" href="https://maps.googleapis.com">
+    <link rel="dns-prefetch" href="https://maps.gstatic.com">
+    {% # theme-check-enable RemoteAsset %}
+
+    {%- if settings.favicon != blank -%}
+      <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png" />
+    {%- endif -%}
+
+    <title>
+      {{- page_title -}}
+      {%- if current_tags -%}
+        {%- assign meta_tags = current_tags | join: ', ' %} &ndash; {{ 'general.meta.tags' | t: tags: meta_tags -}}
+      {%- endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+      {%- if request.page_type == 'password' -%}
+        {{- shop.name -}}
+      {%- else -%}
+        {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+      {%- endif -%}
+    </title>
+
+    {%- if page_description -%}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- endif -%}
+
+    {%- liquid
+      render 'social-meta-tags'
+      
+      render 'css-variables'
+      echo 'theme.css' | asset_url | stylesheet_tag: preload: true
+
+      if direction == 'rtl'
+        echo 'rtl.css' | asset_url | stylesheet_tag: preload: true
+      endif
+    -%}
+
+    <link rel="stylesheet" href="{{ 'apps.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+
+    {{ content_for_header }}
+
+    <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+
+    {%- if settings.enable_tab_attention -%}
+      <script src="{{ 'tab-attention.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- if request.page_type contains 'customers/' -%}
+      <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- render 'js-variables' -%}
+
+          <!-- THIS IS MY CUSTOM CSS -->
+  {{ 'santahelena.css' | asset_url | stylesheet_tag }}
+  <!-- END NEW CODE  -->
+  </head>
+
+  <body class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if request.path == '/challenge' %} template-challange{% endif %}" data-rounded-button="{{ settings.rounded_button }}" data-rounded-input="{{ settings.rounded_input }}" data-rounded-block="{{ settings.rounded_block }}" data-rounded-card="{{ settings.rounded_card }}" data-button-hover="{{ settings.buttons_hover }}"{% if settings.enable_page_transition %} data-page-transition{% endif %}{% if settings.enable_lazy_image %} data-lazy-image{% endif %} data-title-animation data-page-rendering>
+    <a class="sr-only skip-link" href="#MainContent">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+    {%- liquid
+      if settings.enable_page_transition
+        render 'loading-bar'
+      endif
+      
+      render 'mouse-cursor'
+
+      sections 'header-group'
+      sections 'overlay-group'
+    -%}
+
+    <div class="page-container" id="PageContainer">
+      <main class="main-content relative" id="MainContent" role="main">
+        {{ content_for_layout }}
+      </main>
+
+      <footer class="footer-group block w-full" is="footer-group">
+        {%- sections 'footer-group' -%}
+      </footer>
+    </div>
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'general.accessibility.refresh_page' | t }}</li>
+      <li id="a11y-new-window-message">{{ 'general.accessibility.link_messages.new_window' | t }}</li>
+    </ul>
+
+    {%- if request.design_mode == false and settings.preload_links -%}
+      <script src="{{ 'instant-page.js' | asset_url }}" type="module" fetchpriority="low" defer="defer"></script>
+    {%- endif -%}
+
+<script>
+
+let lastScroll = window.scrollY;
+const bar = document.querySelector('.subcollections-bar');
+
+window.addEventListener('scroll', () => {
+  const current = window.scrollY;
+
+  if (current > lastScroll) {
+    // scrolling down → hide
+    bar.classList.add('hide');
+  } else {
+    // scrolling up → show
+    bar.classList.remove('hide');
+  }
+
+  lastScroll = current;
+});
+
+</script>
+
+
+
+
+<script>
+(function () {
+  var root = document.getElementById("shopify-section-template--19782234636484__collection_list_FpPGdQ");
+  if (!root) return;
+
+  var path = (location.pathname || "").replace(/\/+$/, "") || "/";
+  var links = root.querySelectorAll('a.media-card__link[href]');
+
+  for (var i = 0; i < links.length; i++) {
+    var href = (links[i].getAttribute("href") || "").trim();
+    if (!href) continue;
+
+    var hrefPath = href.split("?")[0].replace(/\/+$/, "") || "/";
+    if (hrefPath === path) {
+      links[i].classList.add("is-active");
+      break;
+    }
+  }
+})();
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (document.body.classList.contains("template-collection")) {
+    var bar = document.querySelector(".subcollections-bar");
+    if (bar) {
+      bar.remove();
+    }
+  }
+});
+</script>
+
+<script>
+(function () {
+  if (window.location.pathname !== "/collections/tees") return;
+
+  var styleId = "cw-collection-tees-spacing";
+  if (document.getElementById(styleId)) return;
+
+  var style = document.createElement("style");
+  style.id = styleId;
+  style.textContent = ".product-card__bottom.flex.items-center.gap-2{margin-top:7px!important;}";
+  document.head.appendChild(style);
+})();
+</script>
+
+<script>
+(function () {
+  if (window.location.pathname !== "/") return;
+
+  var styleId = "cw-home-product-bottom-spacing";
+  if (document.getElementById(styleId)) return;
+
+  var style = document.createElement("style");
+  style.id = styleId;
+  style.textContent = ".product-card__bottom.flex.items-center.gap-2{margin-top:2px!important;}";
+  document.head.appendChild(style);
+})();
+</script>
+<script>
+(function () {
+  function apply() {
+    if (window.innerWidth > 768) return;
+
+    var h1 = document.querySelector(".product__title h1");
+    if (!h1) return;
+
+    var sw = h1.querySelector("split-words") || h1;
+    var size = "21.6px";
+
+    sw.style.setProperty("font-size", size, "important");
+    sw.style.setProperty("line-height", "1.1", "important");
+
+    var nodes = sw.querySelectorAll("*");
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].style.setProperty("font-size", size, "important");
+      nodes[i].style.setProperty("line-height", "1.1", "important");
+    }
+  }
+
+  function boot() {
+    apply();
+
+    var root = document.querySelector("product-info") || document.body;
+    if (!root) return;
+
+    var obs = new MutationObserver(function () {
+      apply();
+    });
+
+    obs.observe(root, { childList: true, subtree: true, attributes: true });
+    window.addEventListener("resize", apply);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+
+
+
+<script>
+(function () {
+  function apply(root) {
+    var scope = root || document;
+    var groups = scope.querySelectorAll(".swatches--variant");
+    if (!groups.length) return;
+
+    for (var g = 0; g < groups.length; g++) {
+      var group = groups[g];
+      var inputs = group.querySelectorAll('input[type="radio"]');
+
+      for (var i = 0; i < inputs.length; i++) {
+        var input = inputs[i];
+        var label = group.querySelector('label[for="' + input.id + '"]');
+        if (!label) continue;
+
+        if (!label.classList.contains("color-swatch")) {
+          label.style.removeProperty("outline");
+          label.style.removeProperty("outline-offset");
+          continue;
+        }
+
+        if (input.checked) {
+          label.style.setProperty("outline", "1px solid #000", "important");
+        } else {
+          label.style.removeProperty("outline");
+          label.style.removeProperty("outline-offset");
+        }
+      }
+    }
+  }
+
+  function boot() {
+    apply(document);
+
+    document.addEventListener("change", function (e) {
+      var t = e.target;
+      if (!t || t.type !== "radio") return;
+
+      var group = t.closest(".swatches--variant");
+      if (!group) return;
+
+      apply(group);
+    });
+
+    var root = document.querySelector("product-info") || document.body;
+    var obs = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        var target = mutations[i].target;
+        if (target && target.nodeType === 1) {
+          apply(target);
+        }
+      }
+    });
+
+    obs.observe(root, { childList: true, subtree: true, attributes: true });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+
+
+
+<script>
+(function () {
+  var MODAL_ID = "cw-quickview-modal";
+  var STYLE_ID = "cw-quickview-style";
+
+  function isMobile() {
+    return window.matchMedia("(max-width: 768px)").matches;
+  }
+
+  function ensureStyle() {
+    if (document.getElementById(STYLE_ID)) return;
+    var s = document.createElement("style");
+    s.id = STYLE_ID;
+    s.textContent = ""
+      + "#" + MODAL_ID + "{position:fixed;inset:0;z-index:999999;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.55)}"
+      + "#" + MODAL_ID + "[data-open='1']{display:flex}"
+      + "#" + MODAL_ID + " .cwqv-panel{position:relative;width:min(980px,100%);max-height:min(88vh,100%);overflow:auto;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.35)}"
+      + "#" + MODAL_ID + " .cwqv-close{position:absolute;top:10px;left:10px;z-index:3;width:38px;height:38px;border-radius:999px;border:0;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.18)}"
+      + "#" + MODAL_ID + " .cwqv-close svg{width:18px;height:18px}"
+      + "#" + MODAL_ID + " .cwqv-body{padding:18px}"
+      + "#" + MODAL_ID + " .cwqv-body .quick-add{display:none!important}"
+      + "#" + MODAL_ID + " .cwqv-footer{position:sticky;bottom:0;left:0;right:0;padding:12px 18px;background:#fff;border-top:1px solid rgba(0,0,0,.08);z-index:2}"
+      + "#" + MODAL_ID + " .cwqv-atc{width:100%}";
+    document.head.appendChild(s);
+  }
+
+  function ensureModal() {
+    var existing = document.getElementById(MODAL_ID);
+    if (existing) return existing;
+
+    var wrap = document.createElement("div");
+    wrap.id = MODAL_ID;
+
+    var panel = document.createElement("div");
+    panel.className = "cwqv-panel";
+
+    var closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "cwqv-close";
+    closeBtn.setAttribute("aria-label", "Close quick view");
+    closeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18" stroke="black" stroke-width="2" stroke-linecap="round"/><path d="M6 6L18 18" stroke="black" stroke-width="2" stroke-linecap="round"/></svg>';
+
+    var body = document.createElement("div");
+    body.className = "cwqv-body";
+
+    var footer = document.createElement("div");
+    footer.className = "cwqv-footer";
+
+    var atc = document.createElement("button");
+    atc.type = "button";
+    atc.className = "button button--primary cwqv-atc";
+    atc.setAttribute("is", "hover-button");
+    atc.innerHTML = '<span class="btn-fill" data-fill=""></span><span class="btn-text">Add to cart</span><span class="btn-loader"><span></span><span></span><span></span></span>';
+
+    footer.appendChild(atc);
+    panel.appendChild(closeBtn);
+    panel.appendChild(body);
+    panel.appendChild(footer);
+    wrap.appendChild(panel);
+    document.body.appendChild(wrap);
+
+    closeBtn.addEventListener("click", function () {
+      closeModal();
+    });
+
+    wrap.addEventListener("click", function (e) {
+      if (e.target === wrap) closeModal();
+    });
+
+    return wrap;
+  }
+
+  function lockScroll(lock) {
+    if (lock) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+    } else {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    }
+  }
+
+  function findProductUrl(card) {
+    if (!card) return "";
+    var a = card.querySelector("a[href*='/products/']");
+    if (!a) return "";
+    var href = a.getAttribute("href") || "";
+    if (!href) return "";
+    if (href.indexOf("http") === 0) return href;
+    return href.charAt(0) === "/" ? href : ("/" + href);
+  }
+
+  async function addFirstAvailableVariant(productUrl) {
+    if (!productUrl) throw new Error("missing_product_url");
+    var res = await fetch(productUrl.replace(/\?.*$/, "") + ".js", { credentials: "same-origin" });
+    if (!res.ok) throw new Error("product_json_failed");
+    var product = await res.json();
+    var variants = Array.isArray(product.variants) ? product.variants : [];
+    var v = variants.find(function (x) { return !!x.available; }) || variants[0];
+    if (!v || !v.id) throw new Error("no_variant");
+    var addRes = await fetch("/cart/add.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ id: v.id, quantity: 1 })
+    });
+    if (!addRes.ok) throw new Error("cart_add_failed");
+    return addRes.json();
+  }
+
+  function openModalWithClone(fromBtn) {
+    ensureStyle();
+    var modal = ensureModal();
+    var body = modal.querySelector(".cwqv-body");
+    var atcBtn = modal.querySelector(".cwqv-atc");
+    body.innerHTML = "";
+
+    var card = fromBtn.closest("[data-product-id], .product-card, .product-item, .card, li, article, .grid__item");
+    if (!card) return;
+
+    var clone = card.cloneNode(true);
+    clone.removeAttribute("id");
+    body.appendChild(clone);
+
+    var productUrl = findProductUrl(card);
+    atcBtn.disabled = !productUrl;
+    atcBtn.dataset.productUrl = productUrl || "";
+
+    modal.setAttribute("data-open", "1");
+    lockScroll(true);
+  }
+
+  function closeModal() {
+    var modal = document.getElementById(MODAL_ID);
+    if (!modal) return;
+    modal.removeAttribute("data-open");
+    lockScroll(false);
+    var body = modal.querySelector(".cwqv-body");
+    if (body) body.innerHTML = "";
+    var atcBtn = modal.querySelector(".cwqv-atc");
+    if (atcBtn) {
+      atcBtn.disabled = false;
+      atcBtn.removeAttribute("aria-busy");
+      atcBtn.dataset.productUrl = "";
+    }
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeModal();
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!isMobile()) return;
+
+    var btn = e.target.closest(".quick-add button[aria-label='Choose options'], .quick-add button[aria-controls^='Quickview-']");
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    openModalWithClone(btn);
+  }, true);
+
+  document.addEventListener("click", async function (e) {
+    var atcBtn = e.target.closest("#" + MODAL_ID + " .cwqv-atc");
+    if (!atcBtn) return;
+
+    var url = atcBtn.dataset.productUrl || "";
+    if (!url) return;
+
+    atcBtn.disabled = true;
+    atcBtn.setAttribute("aria-busy", "true");
+
+    try {
+      await addFirstAvailableVariant(url);
+      window.location.href = "/cart";
+    } catch (err) {
+      atcBtn.disabled = false;
+      atcBtn.removeAttribute("aria-busy");
+    }
+  }, true);
+})();
+</script>
+<script>
+(function () {
+  var MODAL_ID = "cw-quickview-modal";
+  var PATCH_STYLE_ID = "cwqv-advanced-slideup-style";
+  var PATCH_FLAG = "cwqvAnimBound";
+
+  if (!document.getElementById(PATCH_STYLE_ID)) {
+    var s = document.createElement("style");
+    s.id = PATCH_STYLE_ID;
+    s.textContent = ""
+      + "#" + MODAL_ID + "{align-items:flex-end!important;justify-content:center!important;padding:0!important;overflow:hidden!important}"
+      + "#" + MODAL_ID + " .cwqv-panel{width:100%!important;will-change:transform,opacity}"
+
+      + "#" + MODAL_ID + ".cwqv-anim-open .cwqv-panel{animation:cwqvSlideUp .78s cubic-bezier(.16,1,.3,1) both}"
+      + "#" + MODAL_ID + ".cwqv-anim-close .cwqv-panel{animation:cwqvSlideDown .42s cubic-bezier(.4,0,1,1) both}"
+
+      + "@keyframes cwqvSlideUp{"
+      + "0%{transform:translate3d(0,100%,0);opacity:0.98}"
+      + "65%{transform:translate3d(0,-10px,0);opacity:1}"
+      + "82%{transform:translate3d(0,4px,0)}"
+      + "100%{transform:translate3d(0,0,0);opacity:1}"
+      + "}"
+
+      + "@keyframes cwqvSlideDown{"
+      + "0%{transform:translate3d(0,0,0);opacity:1}"
+      + "100%{transform:translate3d(0,100%,0);opacity:0.98}"
+      + "}";
+    document.head.appendChild(s);
+  }
+
+  function bindOnce(modal) {
+    if (!modal || modal[PATCH_FLAG]) return;
+    modal[PATCH_FLAG] = true;
+
+    var panel = modal.querySelector(".cwqv-panel");
+    if (!panel) return;
+
+    function playOpen() {
+      modal.classList.remove("cwqv-anim-close");
+      modal.classList.remove("cwqv-anim-open");
+      panel.style.animation = "none";
+      panel.offsetHeight;
+      panel.style.animation = "";
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          modal.classList.add("cwqv-anim-open");
+        });
+      });
+    }
+
+    function playCloseAndThenHide() {
+      modal.classList.remove("cwqv-anim-open");
+      modal.classList.add("cwqv-anim-close");
+      var ms = 420;
+
+      window.setTimeout(function () {
+        if (modal.getAttribute("data-open") !== "1") return;
+        modal.removeAttribute("data-open");
+        modal.classList.remove("cwqv-anim-close");
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
+        var body = modal.querySelector(".cwqv-body");
+        if (body) body.innerHTML = "";
+        var atcBtn = modal.querySelector(".cwqv-atc");
+        if (atcBtn) {
+          atcBtn.disabled = false;
+          atcBtn.removeAttribute("aria-busy");
+          atcBtn.dataset.productUrl = "";
+        }
+      }, ms);
+    }
+
+    var mo = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        if (mutations[i].attributeName === "data-open") {
+          if (modal.getAttribute("data-open") === "1") playOpen();
+        }
+      }
+    });
+    mo.observe(modal, { attributes: true });
+
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        e.preventDefault();
+        e.stopPropagation();
+        playCloseAndThenHide();
+      }
+      var closeBtn = e.target.closest(".cwqv-close");
+      if (closeBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        playCloseAndThenHide();
+      }
+    }, true);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      if (modal.getAttribute("data-open") !== "1") return;
+      e.preventDefault();
+      playCloseAndThenHide();
+    }, true);
+
+    if (modal.getAttribute("data-open") === "1") playOpen();
+  }
+
+  function tryBind() {
+    var modal = document.getElementById(MODAL_ID);
+    if (!modal) return;
+    bindOnce(modal);
+  }
+
+  tryBind();
+  var poll = 0;
+  var t = window.setInterval(function () {
+    poll++;
+    tryBind();
+    if (document.getElementById(MODAL_ID) || poll > 60) window.clearInterval(t);
+  }, 250);
+})();
+</script>
+
+
+
+<script>
+(function () {
+  var MOBILE_MAX = 768;
+
+  function apply() {
+    if (window.innerWidth > MOBILE_MAX) return;
+
+    var wrappers = document.querySelectorAll('fieldset.variant-input-wrapper[data-option-slug="color"]');
+    if (!wrappers.length) return;
+
+    for (var w = 0; w < wrappers.length; w++) {
+      var fieldset = wrappers[w];
+
+      var label = fieldset.querySelector(".form__label");
+      if (label) {
+        label.style.setProperty("font-family", "Neue Haas Grotesk Display", "important");
+        label.style.setProperty("font-weight", "500", "important");
+        label.style.setProperty("font-style", "normal", "important");
+        label.style.setProperty("font-size", "12px", "important");
+        label.style.setProperty("line-height", "130%", "important");
+        label.style.setProperty("letter-spacing", "0", "important");
+      }
+
+      var value = fieldset.querySelector("#" + CSS.escape(fieldset.getAttribute("data-section-id") || "") + "-option1");
+      if (!value) {
+        value = fieldset.querySelector('span[id$="-option1"]');
+      }
+
+      if (value) {
+        value.style.setProperty("font-family", "neue-haas-grotesk-display, sans-serif", "important");
+        value.style.setProperty("font-weight", "600", "important");
+        value.style.setProperty("font-style", "normal", "important");
+        value.style.setProperty("font-size", "12px", "important");
+        value.style.setProperty("line-height", "130%", "important");
+        value.style.setProperty("letter-spacing", "0", "important");
+      }
+
+      if (label) {
+        var kids = label.querySelectorAll("*");
+        for (var i = 0; i < kids.length; i++) {
+          kids[i].style.setProperty("font-family", "neue-haas-grotesk-display, sans-serif", "important");
+          kids[i].style.setProperty("font-weight", "600", "important");
+          kids[i].style.setProperty("font-style", "normal", "important");
+          kids[i].style.setProperty("font-size", "12px", "important");
+          kids[i].style.setProperty("line-height", "130%", "important");
+          kids[i].style.setProperty("letter-spacing", "0", "important");
+        }
+      }
+    }
+  }
+
+  function boot() {
+    apply();
+
+    var root = document.querySelector("product-info") || document.body;
+    var obs = new MutationObserver(function () { apply(); });
+    obs.observe(root, { childList: true, subtree: true, attributes: true });
+
+    window.addEventListener("resize", apply);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+
+
+
+<script>
+(function () {
+  var ROOT_SELECTOR = ".product__text.rte.text-base";
+
+  function injectStyle() {
+    if (document.getElementById("force-product-typography")) return;
+
+    var css = `
+${ROOT_SELECTOR},
+${ROOT_SELECTOR} p,
+${ROOT_SELECTOR} span,
+${ROOT_SELECTOR} br {
+  font-family: neue-haas-grotesk-display, sans-serif !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 200% !important;
+  letter-spacing: 0% !important;
+}
+
+${ROOT_SELECTOR} strong {
+  font-family: neue-haas-grotesk-display, sans-serif !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 100% !important;
+  letter-spacing: 0% !important;
+}
+    `;
+
+    var style = document.createElement("style");
+    style.id = "force-product-typography";
+    style.appendChild(document.createTextNode(css));
+    document.head.appendChild(style);
+  }
+
+  function init() {
+    var root = document.querySelector(ROOT_SELECTOR);
+    if (!root) return;
+    injectStyle();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+<style>
+html, body {
+  overscroll-behavior-y: auto !important;
+}
+</style>
+<style>
+/* REMOVE QUALQUER BORDA DO LABEL */
+.swatches--variant label.color-swatch {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* REMOVE BORDA DO ESTADO CHECKED */
+.swatches--variant input[type="radio"]:checked + label.color-swatch {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* REMOVE POSSÍVEL OUTLINE OFFSET */
+.swatches--variant label.color-swatch {
+  outline-offset: 0 !important;
+}
+</style>
+
+<style>
+/* REMOVE A CAIXA PRETA DOS SIZES */
+
+product-variant-picker label,
+.product-form__input label,
+.swatches label {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* REMOVE ESTADO ATIVO QUE O TEMA INJETA */
+product-variant-picker input[type="radio"]:checked + label,
+.product-form__input input[type="radio"]:checked + label,
+.swatches input[type="radio"]:checked + label {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* mantém só a linha embaixo */
+product-variant-picker input[type="radio"]:checked + label span,
+.product-form__input input[type="radio"]:checked + label span {
+  border-bottom: 2px solid currentColor !important;
+}
+</style>
+
+
+
+<script>
+(function () {
+  const root = document;
+
+  const getInputFromTarget = (t) => {
+    if (!t) return null;
+    if (t.matches && t.matches('input[type="radio"][data-option-value]')) return t;
+
+    const label = t.closest && t.closest('label[for]');
+    if (label) {
+      const id = label.getAttribute('for');
+      if (id) return document.getElementById(id);
+    }
+
+    const li = t.closest && t.closest('li');
+    if (li) {
+      const input = li.querySelector && li.querySelector('input[type="radio"][data-option-value]');
+      if (input) return input;
+    }
+
+    return null;
+  };
+
+  const updateUi = (input) => {
+    const fieldset = input.closest('fieldset');
+    if (fieldset) {
+      const valueSpan = fieldset.querySelector('.form__label .font-medium');
+      if (valueSpan) valueSpan.textContent = input.value;
+      fieldset.setAttribute('data-last-picked', input.value);
+    }
+
+    const li = input.closest('li');
+    if (li) {
+      const ul = li.closest('ul');
+      if (ul) ul.querySelectorAll('li').forEach((x) => x.classList.remove('is-picked'));
+      li.classList.add('is-picked');
+    }
+  };
+
+  const forcePick = (input) => {
+    if (!input) return;
+    if (input.disabled) return;
+
+    input.checked = true;
+
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    updateUi(input);
+  };
+
+  root.addEventListener('click', (e) => {
+    const input = getInputFromTarget(e.target);
+    if (!input) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    forcePick(input);
+
+    try {
+      console.log('[swatch-click]', {
+        id: input.id,
+        name: input.name,
+        value: input.value,
+        checked: input.checked
+      });
+    } catch (_) {}
+  }, true);
+
+  const style = document.createElement('style');
+
+  document.head.appendChild(style);
+})();
+</script>
+
+<script>
+(function () {
+  function inject() {
+    if (document.getElementById("cw-force-haas-font")) return;
+    var style = document.createElement("style");
+    style.id = "cw-force-haas-font";
+    style.textContent =
+      ".cw-perks, .cw-perks *{font-family:'neue-haas-grotesk-display' !important;}";
+    document.head.appendChild(style);
+  }
+
+  function run() { inject(); }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else {
+    run();
+  }
+
+  document.addEventListener("shopify:section:load", run);
+})();
+</script>
+<script>
+(function () {
+  var PATCHED = false;
+
+  function isHome() {
+    var p = window.location.pathname || "/";
+    return p === "/" || p === "" || p === "/index" || p === "/index.html";
+  }
+
+  function norm(s) {
+    return String(s || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+
+  function getBar() {
+    return document.querySelector(".subcollections-bar");
+  }
+
+  function getLinks(bar) {
+    if (!bar) return [];
+    return Array.prototype.slice.call(bar.querySelectorAll(".subcollections-link"));
+  }
+
+  function getAllMeta() {
+    var bar = getBar();
+    var links = getLinks(bar);
+    if (!links.length) return null;
+
+    var allLink = null;
+    for (var i = 0; i < links.length; i++) {
+      if (norm(links[i].textContent) === "all") { allLink = links[i]; break; }
+    }
+    if (!allLink) return null;
+
+    var href = String(allLink.getAttribute("href") || "");
+    var idx = links.indexOf(allLink);
+
+    return { href: href, index: idx, text: "all" };
+  }
+
+  function applyDomAllActive() {
+    if (!isHome()) return;
+    var bar = getBar();
+    if (!bar) return;
+
+    var links = getLinks(bar);
+    if (!links.length) return;
+
+    var allLink = null;
+    for (var i = 0; i < links.length; i++) {
+      if (norm(links[i].textContent) === "all") { allLink = links[i]; break; }
+    }
+    if (!allLink) return;
+
+    for (var k = 0; k < links.length; k++) {
+      links[k].classList.remove("is-active", "active");
+      links[k].removeAttribute("aria-current");
+    }
+    allLink.classList.add("is-active");
+    allLink.setAttribute("aria-current", "page");
+  }
+
+  function looksRelevantKey(key) {
+    return /sub|collection|collections|tab|active|nav|menu|filter|highlight|selected/i.test(String(key || ""));
+  }
+
+  function patchJsonValue(v, allMeta) {
+    var s = String(v || "");
+    var obj;
+    try { obj = JSON.parse(s); } catch (e) { return null; }
+    if (!obj || typeof obj !== "object") return null;
+
+    var changed = false;
+
+    if (typeof obj.activeIndex === "number" && obj.activeIndex !== allMeta.index) {
+      obj.activeIndex = allMeta.index;
+      changed = true;
+    }
+    if (typeof obj.selectedIndex === "number" && obj.selectedIndex !== allMeta.index) {
+      obj.selectedIndex = allMeta.index;
+      changed = true;
+    }
+
+    var allHref = allMeta.href;
+    var allText = allMeta.text;
+
+    var keys = ["active", "activeTab", "activeHandle", "activeCollection", "selected", "selectedTab", "selectedHandle", "selectedCollection", "current", "currentTab"];
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (typeof obj[k] === "string") {
+        var val = norm(obj[k]);
+        if (val && val !== allText && val !== norm(allHref)) {
+          obj[k] = allHref || "all";
+          changed = true;
+        }
+      }
+    }
+
+    if (!changed) return null;
+    try { return JSON.stringify(obj); } catch (e2) { return null; }
+  }
+
+  function normalizeValueToAll(value, allMeta) {
+    var s = String(value || "");
+    var patchedJson = patchJsonValue(s, allMeta);
+    if (patchedJson) return patchedJson;
+
+    var vNorm = norm(s);
+    if (!vNorm) return s;
+
+    if (vNorm === "all") return allMeta.href || s;
+
+    var bar = getBar();
+    var links = getLinks(bar);
+    for (var i = 0; i < links.length; i++) {
+      var t = norm(links[i].textContent);
+      if (t && vNorm.indexOf(t) !== -1 && t !== "all") {
+        return allMeta.href || "all";
+      }
+      var href = String(links[i].getAttribute("href") || "");
+      if (href && s.indexOf(href) !== -1 && href !== allMeta.href) {
+        return allMeta.href || "all";
+      }
+    }
+
+    return s;
+  }
+
+  function forceStorageAll() {
+    if (!isHome()) return;
+    var allMeta = getAllMeta();
+    if (!allMeta) return;
+
+    var storages = [window.localStorage, window.sessionStorage];
+
+    for (var si = 0; si < storages.length; si++) {
+      var st = storages[si];
+      if (!st) continue;
+
+      var keys = [];
+      for (var i = 0; i < st.length; i++) {
+        var k = st.key(i);
+        if (k) keys.push(k);
+      }
+
+      for (var j = 0; j < keys.length; j++) {
+        var key = keys[j];
+        if (!looksRelevantKey(key)) continue;
+
+        var cur = st.getItem(key);
+        if (cur == null) continue;
+
+        var next = normalizeValueToAll(cur, allMeta);
+        if (next !== cur) {
+          try { st.setItem(key, next); } catch (e) {}
+        }
+      }
+    }
+  }
+
+  function hookStorage() {
+    if (PATCHED) return;
+    PATCHED = true;
+
+    function wrapStorage(st) {
+      if (!st) return;
+
+      var origSet = st.setItem.bind(st);
+      var origRemove = st.removeItem.bind(st);
+
+      st.setItem = function (key, value) {
+        if (isHome() && looksRelevantKey(key)) {
+          var allMeta = getAllMeta();
+          if (allMeta) value = normalizeValueToAll(value, allMeta);
+        }
+        return origSet(key, value);
+      };
+
+      st.removeItem = function (key) {
+        return origRemove(key);
+      };
+    }
+
+    wrapStorage(window.localStorage);
+    wrapStorage(window.sessionStorage);
+  }
+
+  function hardSync() {
+    hookStorage();
+    forceStorageAll();
+    applyDomAllActive();
+
+    setTimeout(function () {
+      forceStorageAll();
+      applyDomAllActive();
+    }, 50);
+
+    setTimeout(function () {
+      forceStorageAll();
+      applyDomAllActive();
+    }, 250);
+  }
+
+  function bindLogo() {
+    var logoLink = document.querySelector(".header__logo a.header__logo-link[href='/'], .header__logo a[href='/']");
+    if (!logoLink) return;
+    if (logoLink.dataset.allStorageBound === "1") return;
+    logoLink.dataset.allStorageBound = "1";
+
+    logoLink.addEventListener("click", function () {
+      hardSync();
+    }, { capture: true });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    bindLogo();
+    hardSync();
+  });
+
+  window.addEventListener("pageshow", function () {
+    bindLogo();
+    hardSync();
+  });
+
+  window.addEventListener("popstate", function () {
+    hardSync();
+  });
+})();
+</script>
+
+
+  </body>
+  <script>
+(function () {
+  var lockedY = null;
+  var lockUntil = 0;
+
+  function now() {
+    return Date.now ? Date.now() : +new Date();
+  }
+
+  function getY() {
+    return window.pageYOffset || document.documentElement.scrollTop || 0;
+  }
+
+  function setY(y) {
+    window.scrollTo(0, y);
+  }
+
+  function lock() {
+    lockedY = getY();
+    lockUntil = now() + 1200;
+  }
+
+  function restore() {
+    if (lockedY == null) return;
+    if (now() > lockUntil) return;
+    setY(lockedY);
+  }
+
+  function burstRestore() {
+    restore();
+    requestAnimationFrame(restore);
+    setTimeout(restore, 0);
+    setTimeout(restore, 60);
+    setTimeout(restore, 180);
+    setTimeout(restore, 420);
+  }
+
+  function wrapHistory(fnName) {
+    if (!history || !history[fnName]) return;
+    var original = history[fnName];
+    history[fnName] = function () {
+      var res = original.apply(this, arguments);
+      if (lockedY != null && now() <= lockUntil) burstRestore();
+      return res;
+    };
+  }
+
+  wrapHistory('replaceState');
+  wrapHistory('pushState');
+
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t) return;
+
+    if (
+      (t.closest && t.closest('label[for]')) ||
+      (t.matches && t.matches('input[type="radio"], input[type="checkbox"]')) ||
+      (t.closest && t.closest('variant-picker')) ||
+      (t.closest && t.closest('[data-option-value]'))
+    ) {
+      lock();
+      burstRestore();
+    }
+  }, true);
+
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (!t) return;
+
+    if (
+      (t.matches && t.matches('input[type="radio"], select[name="id"]')) ||
+      (t.closest && t.closest('variant-picker')) ||
+      (t.matches && t.matches('[data-option-value]'))
+    ) {
+      lock();
+      burstRestore();
+    }
+  }, true);
+
+  window.addEventListener('resize', function () {
+    if (lockedY != null && now() <= lockUntil) burstRestore();
+  }, { passive: true });
+
+  var mo = new MutationObserver(function () {
+    if (lockedY != null && now() <= lockUntil) burstRestore();
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+
+
+>>>>>>> bdc1b2b (theme save push)
 </html>

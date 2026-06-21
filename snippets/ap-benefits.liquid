@@ -1,0 +1,71 @@
+{% comment %}
+  Snippet: ap-benefits.liquid
+  Usage:
+  {% render 'ap-benefits', rows: rows %}
+{% endcomment %}
+
+{%- assign _rows = rows | default: '' | split: '' -%}
+{%- if rows != blank -%}
+  {%- assign _rows = rows -%}
+{%- endif -%}
+
+<div class="ap-benefits">
+  {%- for row_text in _rows limit: 3 -%}
+    {%- if row_text != blank -%}
+      <div class="ap-benefits__row">
+        <div class="ap-benefits__icon">
+          {%- case forloop.index -%}
+            {%- when 1 -%}{% render 'icon-truck' %}
+            {%- when 2 -%}{% render 'icon-sunner' %}
+            {%- when 3 -%}{% render 'icon-returns' %}
+          {%- endcase -%}
+        </div>
+        <div class="ap-benefits__text">
+          {{ row_text }}
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+</div>
+
+<style>
+  .ap-benefits {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ap-benefits__row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid #EAEAEA;
+  }
+
+  .ap-benefits__row:first-child {
+    border-top: 1px solid #EAEAEA;
+  }
+
+  .ap-benefits__icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ap-benefits__icon svg {
+    width: 44px;
+    height: 44px;
+    display: block;
+  }
+
+  .ap-benefits__text {
+    font-family: neue-haas-grotesk-display, sans-serif !important;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 130%;
+    letter-spacing: 0;
+  }
+</style>

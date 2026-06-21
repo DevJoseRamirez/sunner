@@ -1,10 +1,26 @@
+<<<<<<< HEAD
 {
   "name": "t:sections.footer.name",
   "type": "footer",
+=======
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "t:sections.footer-group.name",
+>>>>>>> bdc1b2b (theme save push)
   "sections": {
     "footer": {
       "type": "footer",
       "blocks": {
+<<<<<<< HEAD
         "40421ea9-5f50-4a75-bab0-da57e077ffe8": {
           "type": "link_list",
           "settings": {
@@ -26,10 +42,45 @@
           "type": "link_list",
           "settings": {
             "menu": "footer"
+=======
+        "logo_social_QrzzwF": {
+          "type": "logo_social",
+          "settings": {
+            "logo": "shopify://shop_images/Vector.svg",
+            "logo_height": 50,
+            "show_social": false,
+            "enable_follow_on_shop": false
+          }
+        },
+        "link_list-1": {
+          "type": "link_list",
+          "settings": {
+            "heading": "",
+            "menu": "main-menu-2",
+            "container_width": 50,
+            "opened": true
+          }
+        },
+        "brand_information": {
+          "type": "brand_information",
+          "settings": {
+            "heading": "",
+            "button_label_1": "",
+            "button_link_1": "",
+            "button_label_2": "team@sunner.co",
+            "button_link_2": "mailto:hello@domain.com",
+            "button_label_3": "",
+            "button_link_3": "",
+            "button_label_4": "",
+            "button_link_4": "",
+            "container_width": 95,
+            "opened": false
+>>>>>>> bdc1b2b (theme save push)
           }
         }
       },
       "block_order": [
+<<<<<<< HEAD
         "40421ea9-5f50-4a75-bab0-da57e077ffe8",
         "a3995b08-7dd6-42ee-9027-57980c974c0e",
         "77ef77d0-7a28-4d31-9dd9-9a8ba0e2807b"
@@ -48,10 +99,61 @@
         "margin_top": 0,
         "padding_top": 16,
         "padding_bottom": 16
+=======
+        "logo_social_QrzzwF",
+        "link_list-1",
+        "brand_information"
+      ],
+      "settings": {
+        "invert_newsletter_others": true,
+        "enable_newsletter": true,
+        "newsletter_heading": "Stay tapped in",
+        "newsletter_heading_size": "md:title-sm",
+        "newsletter_text": "",
+        "newsletter_logo_height": 50,
+        "show_social": false,
+        "enable_follow_on_shop": false,
+        "color_text": "#ffffff",
+        "color_background": "#000000",
+        "gradient_background": "",
+        "color_button_text": "#000000",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "padding_top": 16,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false
+      }
+    },
+    "footer-copyright": {
+      "type": "footer-copyright",
+      "settings": {
+        "enable_language_selector": true,
+        "enable_country_selector": true,
+        "show_policy": true,
+        "show_payment_icons": false,
+        "monochrome_payment_icons": false,
+        "show_copyright": true,
+        "copyright_text": "",
+        "color_text": "#ffffff",
+        "color_background": "#000000",
+        "gradient_background": "",
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false
+>>>>>>> bdc1b2b (theme save push)
       }
     }
   },
   "order": [
+<<<<<<< HEAD
     "footer"
+=======
+    "footer",
+    "footer-copyright"
+>>>>>>> bdc1b2b (theme save push)
   ]
 }

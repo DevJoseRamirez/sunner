@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {%- style -%}
   .section-{{ section.id }}-padding {
     padding-top: calc({{ section.settings.padding_top }}px * 0.75);
@@ -14,12 +15,26 @@
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <div class="section-{{ section.id }}-padding">
     {{ section.settings.custom_liquid }}
+=======
+<style>
+  #shopify-section-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    {%- render 'section-variables', section: section -%}
+  }
+</style>
+
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
+  <div class="page-width{% if section.settings.narrow %} page-width--narrow{% endif %} relative">
+    {{ section.settings.liquid }}
+>>>>>>> bdc1b2b (theme save push)
   </div>
 </div>
 
 {% schema %}
 {
   "name": "t:sections.custom-liquid.name",
+<<<<<<< HEAD
   "tag": "section",
   "class": "section",
   "settings": [
@@ -38,32 +53,125 @@
     {
       "type": "header",
       "content": "t:sections.all.padding.section_padding_heading"
+=======
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "liquid",
+      "label": "t:sections.custom-liquid.settings.liquid.label",
+      "info": "t:sections.custom-liquid.settings.liquid.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.global.settings.header__colors.content",
+      "info": "t:sections.global.settings.header__colors.info"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "t:sections.global.settings.color_text.label"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "t:sections.global.settings.color_background.label"
+    },
+    {
+      "type": "color_background",
+      "id": "gradient_background",
+      "label": "t:sections.global.settings.gradient_background.label"
+    },
+    {
+      "type": "color",
+      "id": "color_button_text",
+      "label": "t:sections.global.settings.color_button_text.label"
+    },
+    {
+      "type": "color",
+      "id": "color_button_background",
+      "label": "t:sections.global.settings.color_button_background.label"
+    },
+    {
+      "type": "color_background",
+      "id": "color_button_gradient",
+      "label": "t:sections.global.settings.color_button_gradient.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.global.settings.header__section.content"
+>>>>>>> bdc1b2b (theme save push)
     },
     {
       "type": "range",
       "id": "padding_top",
       "min": 0,
+<<<<<<< HEAD
       "max": 100,
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_top",
       "default": 40
+=======
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.global.settings.padding_top.label",
+      "default": 72
+>>>>>>> bdc1b2b (theme save push)
     },
     {
       "type": "range",
       "id": "padding_bottom",
       "min": 0,
+<<<<<<< HEAD
       "max": 100,
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 52
+=======
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.global.settings.padding_bottom.label",
+      "default": 72
+    },
+    {
+      "type": "checkbox",
+      "id": "divider",
+      "label": "t:sections.global.settings.divider.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "narrow",
+      "label": "t:sections.global.settings.narrow.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "rounded",
+      "default": false,
+      "label": "t:sections.global.settings.rounded.label"
+>>>>>>> bdc1b2b (theme save push)
     }
   ],
   "presets": [
     {
+<<<<<<< HEAD
       "name": "t:sections.custom-liquid.presets.name"
     }
   ]
+=======
+      "name": "t:sections.custom-liquid.name",
+      "category": "t:categories.layout"
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "custom.overlay"
+    ]
+  }
+>>>>>>> bdc1b2b (theme save push)
 }
 {% endschema %}
