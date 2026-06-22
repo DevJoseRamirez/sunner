@@ -1,4 +1,4 @@
-<style>
+{% style %}
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
@@ -7,26 +7,98 @@
     --color-transparent: {{ section.settings.transparent_color_text.rgb }};
     --color-localization: {{ section.settings.color_localization.rgb }};
   }
-  .menu-drawer-button svg {
-  transform: scaleY(0.75);
-}
+{% endstyle %}
 
-p.announcement-text.leading-tight {
-    font-size: 12px !important;
-    line-height: 0% !important;
-    letter-spacing: 0 !important;
-    font-family: Neue Haas Grotesk Display !important;
-}
+{% if template.name == 'index' %}
+  {% style %} 
+        #shopify-section-{{ section.id }} {
+          background: none;
+          background-color: transperant;
+        }
 
-.header_
+        .header,
+        .subcollections-bar {
+          background: none;
+          background-color: transperant;
+          border: none;
+          margin-top: 2px;
+        }
+        /* Subcollections bar */
+        .subcollections-bar {
+          overflow: visible;
+        }
 
-</style>
+        .subcollections-nav {
+          overflow-x: auto;
+          overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+
+        .subcollections-nav::-webkit-scrollbar {
+          display: none;
+        }
+
+        .subcollections-nav ul {
+          flex-wrap: nowrap;
+          width: max-content;
+          padding-right: 48px;
+        }
+
+        .subcollections-nav ul > li {
+          flex: 0 0 auto;
+        }
+
+        .subcollections-link {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 26px;
+          transition: all .3s ease-in-out;
+        }
+        . subcollections-link:hover {
+          background: rgba(0, 0, 0, 0.08);
+              width: 96px;
+      height: 26px;
+      padding: 0;
+      background: rgba(0, 0, 0, 0.08);
+        }
+
+        .subcollections-link.is-active {
+          background: #E5E5E5;
+          background: #ffffff5e;
+          width: 96px;
+          height: 26px;
+          padding: 0;
+          background: rgba(0, 0, 0, 0.08)
+        }
+      p.announcement-text.leading-tight {
+              font-size: 12px !important;
+          line-height: 0% !important;
+          letter-spacing: 0 !important;
+          font-family: Neue Haas Grotesk Display !important;
+          color: black;
+
+        }
+        /* styles overwrites */
+        .topbar,
+        .topbar-section {
+          background: none;
+          background-color: transperant;
+          color: black;
+        }
+
+      .js .shopify-section-group-header-group .section:before {
+        background: none;
+          background-color: transperant;
+    }
+  {% endstyle %}
+{% endif %}
 
 {%- liquid
   assign header_layout = section.settings.header_layout
   assign main_menu = section.settings.menu
   assign link_count = main_menu.links.size
-  
 
   if header_layout == 'center-split'
     assign link_count = link_count | divided_by: 2
@@ -36,7 +108,6 @@ p.announcement-text.leading-tight {
   case header_layout
     when 'center-split'
       assign main_menu_class = 'lg:justify-end'
-
     when 'center'
       assign main_menu_class = 'lg:justify-center'
   endcase
@@ -49,73 +120,83 @@ p.announcement-text.leading-tight {
   render 'header-drawer', section: section
 -%}
 
-{%- liquid
-  assign current_path = request.path | downcase
-  assign hide_subcollections = false
-
-  if current_path contains '/collections' or current_path contains '/collection' or current_path contains '/products' or current_path contains '/product'
-    assign hide_subcollections = true
-  endif
--%}
-
-<header data-section-id="{{ section.id }}" class="header header--{{ header_layout }} mobile:header--{{ section.settings.logo_position_mobile }} page-width{% if section.settings.full_width %} page-width--full{% endif %} section{% if section.settings.rounded %} section--rounded{% endif %} section--padding grid items-center z-20 relative w-full"{% if section.settings.sticky_header_type != 'none' %} is="sticky-header" data-sticky-type="{{ section.settings.sticky_header_type }}"{% else %} is="custom-header"{% endif %}>
+<header
+  data-section-id="{{ section.id }}"
+  class="header header--{{ header_layout }} mobile:header--{{ section.settings.logo_position_mobile }} page-width{% if section.settings.full_width %} page-width--full{% endif %} section{% if section.settings.rounded %} section--rounded{% endif %} section--padding grid items-center z-20 relative w-full"
+  {% if section.settings.sticky_header_type != 'none' %}
+    is="sticky-header"
+    data-sticky-type="{{ section.settings.sticky_header_type }}"
+  {% else %}
+    is="custom-header"
+  {% endif %}
+>
   {%- liquid
     render 'header-icons', section: section, show_search: true, show_hamburger: true, show_toggle: show_toggle, context: 'start'
 
-    if header_layout != 'center-left' and header_layout != 'center-split'
+    unless header_layout == 'center-left' or header_layout == 'center-split'
       render 'header-logo', logo_h1: section.settings.logo_h1
-    endif
+    endunless
 
     if header_layout == 'center'
       render 'header-icons', section: section, show_search: true, show_account: true, show_cart: true, show_hamburger: true, context: 'end'
     endif
   -%}
-  
-  <div class="header__navigation hidden lg:flex lg:gap-5 {{ main_menu_class }}"{% if header_layout == 'center' %} id="MenuToggle"{% endif %}>
+
+  <div
+    class="header__navigation hidden lg:flex lg:gap-5 {{ main_menu_class }}"
+    {% if header_layout == 'center' %}
+      id="MenuToggle"
+    {% endif %}
+  >
     <nav class="header__menu hidden lg:flex" role="navigation" aria-label="Primary">
       {%- render 'header-nav-desktop', section: section, main_menu: main_menu, limit: link_count, context: 'start' -%}
     </nav>
-
-    
   </div>
 
-  {%- liquid
-    if header_layout == 'center-left' or header_layout == 'center-split'
-      render 'header-logo', logo_h1: section.settings.logo_h1
-    endif
-  -%}
-  
+  {%- if header_layout == 'center-left' or header_layout == 'center-split' -%}
+    {%- render 'header-logo', logo_h1: section.settings.logo_h1 -%}
+  {%- endif -%}
+
   {%- if header_layout == 'center-split' -%}
     <div class="header__navigation header__navigation--split hidden lg:flex lg:gap-5 lg:justify-start">
       <nav class="header__menu hidden lg:flex" role="navigation" aria-label="Secondary">
         {%- render 'header-nav-desktop', section: section, main_menu: main_menu, offset: link_count, context: 'end' -%}
       </nav>
-      
     </div>
   {%- endif -%}
 
-  {%- liquid
-    if header_layout != 'center'
-      render 'header-icons', section: section, show_search: true, show_account: true, show_cart: true, show_hamburger: true, context: 'end'
-    endif
-  -%}
+  {%- unless header_layout == 'center' -%}
+    {%- render 'header-icons',
+      section: section,
+      show_search: true,
+      show_account: true,
+      show_cart: true,
+      show_hamburger: true,
+      context: 'end'
+    -%}
+  {%- endunless -%}
 
   {%- if section.settings.rounded -%}
     {%- render 'corner', dir: 'bottom', border: true, prefix: 'header' -%}
   {%- else -%}
     <span class="header__cutout cutout opacity-0 absolute left-0 top-100 w-full pointer-events-none"></span>
   {%- endif -%}
-
-
-
 </header>
 
-{% if hide_subcollections == false %}
-  {% if linklists['subcollections'] and linklists['subcollections'].links.size > 0 %}
+{%- liquid
+  assign current_path = request.path | downcase
+  assign hide_subcollections = false
+  if current_path contains '/collections' or current_path contains '/collection' or current_path contains '/products' or current_path contains '/product'
+    assign hide_subcollections = true
+  endif
+-%}
+
+{% unless hide_subcollections %}
+  {% if linklists.subcollections and linklists.subcollections.links.size > 0 %}
     <div class="subcollections-bar w-full border-t border-b py-3">
       <nav class="subcollections-nav page-width">
         <ul class="flex gap-5">
-          {% for link in linklists['subcollections'].links %}
+          {% for link in linklists.subcollections.links %}
             <li>
               <a href="{{ link.url }}" class="subcollections-link menu__item">
                 {{ link.title }}
@@ -126,7 +207,7 @@ p.announcement-text.leading-tight {
       </nav>
     </div>
   {% endif %}
-{% endif %}
+{% endunless %}
 
 {%- if section.settings.hover_menu -%}
   <span class="overlay opacity-0 z-1 fixed left-0 w-full pointer-events-none"></span>
@@ -136,147 +217,59 @@ p.announcement-text.leading-tight {
 
 {%- if request.design_mode -%}
   <script>
-    document.documentElement.style.setProperty('--header-height', document.getElementById('shopify-section-{{ section.id }}').getBoundingClientRect().height.toFixed(1) + 'px');
+    document.documentElement.style.setProperty(
+      '--header-height',
+      document.getElementById('shopify-section-{{ section.id }}').getBoundingClientRect().height.toFixed(1) + 'px'
+    );
   </script>
 {%- endif -%}
 
 <script>
-(function () {
-  var path = window.location.pathname.toLowerCase();
-  var shouldHide =
-    path.indexOf('/collections') !== -1 ||
-    path.indexOf('/collection') !== -1 ||
-    path.indexOf('/products') !== -1 ||
-    path.indexOf('/product') !== -1;
+  'use strict';
+  (function () {
+    var bar = document.querySelector('.subcollections-bar');
+    if (!bar) return;
 
-  if (!shouldHide) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.subcollections-link'));
+    if (!links.length) return;
 
-  function hideSubcollections() {
-    document.querySelectorAll('.subcollections-bar').forEach(function (bar) {
-      bar.style.display = 'none';
-      bar.setAttribute('hidden', 'hidden');
-    });
-  }
+    var KEY = 'subcollection_active';
+    var isHomepage = window.location.pathname === '/' || window.location.pathname === '/index.html';
 
-  hideSubcollections();
-  document.addEventListener('DOMContentLoaded', hideSubcollections);
-  document.addEventListener('shopify:section:load', hideSubcollections);
-})();
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  var bar = document.querySelector(".subcollections-bar");
-  if (!bar) return;
-
-  var nav = bar.querySelector(".subcollections-nav");
-  var list = nav ? nav.querySelector("ul.flex") : null;
-  var links = list ? Array.prototype.slice.call(list.querySelectorAll(".subcollections-link")) : [];
-  if (!links.length) return;
-
-  var KEY = "sunner_subcollection_active_title";
-  var isHomepage = window.location.pathname === "/" || window.location.pathname === "/index.html";
-
-  function normalizeTitle(str) {
-    return (str || "").replace(/\s+/g, " ").trim().toUpperCase();
-  }
-
-  function resetAll() {
-    links.forEach(function (link) {
-      link.classList.remove("is-active");
-    });
-  }
-
-  function setActiveByTitle(title) {
-    var target = normalizeTitle(title);
-    if (!target) return;
-
-    for (var i = 0; i < links.length; i++) {
-      if (normalizeTitle(links[i].textContent) === target) {
-        resetAll();
-        links[i].classList.add("is-active");
-        scrollIntoViewIfNeeded(links[i]);
-        return;
-      }
-    }
-  }
-
-  function scrollIntoViewIfNeeded(el) {
-    if (!nav) return;
-    var elRect = el.getBoundingClientRect();
-    var navRect = nav.getBoundingClientRect();
-
-    if (elRect.right > navRect.right || elRect.left < navRect.left) {
-      nav.scrollTo({
-        left: el.offsetLeft - nav.offsetLeft - 40,
-        behavior: "smooth"
+    function setActive(title) {
+      var t = (title || '').trim().toUpperCase();
+      links.forEach(function (link) {
+        var match = link.textContent.trim().toUpperCase() === t;
+        link.classList.toggle('is-active', match);
+        if (match) scrollToLink(link);
       });
     }
-  }
 
-  links.forEach(function (link) {
-    link.addEventListener("click", function () {
-      try {
-        sessionStorage.setItem(KEY, normalizeTitle(this.textContent));
-      } catch (e) {}
-      resetAll();
-      this.classList.add("is-active");
+    function scrollToLink(el) {
+      var nav = bar.querySelector('.subcollections-nav');
+      if (nav) nav.scrollTo({ left: el.offsetLeft - nav.offsetLeft - 40, behavior: 'smooth' });
+    }
+
+    links.forEach(function (link) {
+      link.addEventListener('click', function () {
+        try {
+          sessionStorage.setItem(KEY, this.textContent.trim());
+        } catch (e) {}
+      });
     });
-  });
 
-  if (isHomepage) {
-    try { sessionStorage.removeItem(KEY); } catch (e) {}
-    setActiveByTitle("ALL");
-  } else {
-    try {
-      var saved = sessionStorage.getItem(KEY);
-      if (saved) setActiveByTitle(saved);
-    } catch (e) {}
-  }
-
-  var style = document.createElement("style");
-  style.innerHTML = `
-    .subcollections-bar {
-      overflow: visible;
+    if (isHomepage) {
+      try {
+        sessionStorage.removeItem(KEY);
+      } catch (e) {}
+      setActive('ALL');
+    } else {
+      try {
+        var saved = sessionStorage.getItem(KEY);
+        if (saved) setActive(saved);
+      } catch (e) {}
     }
-
-    .subcollections-bar .subcollections-nav {
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-
-    .subcollections-bar .subcollections-nav::-webkit-scrollbar {
-      display: none;
-    }
-
-    .subcollections-bar .subcollections-nav ul.flex {
-      flex-wrap: nowrap;
-      width: max-content;
-      padding-right: 48px;
-    }
-
-    .subcollections-bar .subcollections-nav ul.flex > li {
-      flex: 0 0 auto;
-    }
-
-    .subcollections-bar .subcollections-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 26px;
-    }
-
-    .subcollections-bar .subcollections-link.is-active {
-      background: #E5E5E5;
-      width: 96px;
-      height: 26px;
-      padding: 0;
-    }
-  `;
-  document.head.appendChild(style);
-});
+  })();
 </script>
 
 {% schema %}
@@ -1802,9 +1795,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   ],
   "enabled_on": {
-    "groups": [
-      "header"
-    ]
+    "groups": ["header"]
   }
 }
 {% endschema %}
