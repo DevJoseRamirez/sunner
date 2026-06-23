@@ -9,8 +9,9 @@
   }
 {% endstyle %}
 
+{% comment %} HOME PAGE ONLY STYLES {% endcomment %}
 {% if template.name == 'index' %}
-  {% style %} 
+  {% style %}
         #shopify-section-{{ section.id }} {
           background: none;
           background-color: transperant;
@@ -94,6 +95,66 @@
     }
   {% endstyle %}
 {% endif %}
+
+{% comment %} NOTE HOME PAGE {% endcomment %}
+{% unless template.name == 'index' %}
+  {% style %}
+    .header,
+        .subcollections-bar {
+          /* background: none; */
+          background-color: transperant;
+          border: none;
+          margin-top: 2px;
+        }
+       .topbar-section {
+          margin: 0;
+          width: 100%;
+        }
+
+       .header-section .header:before,
+        [data-sticky-type="always"] .header:before {
+          background: none;
+          background-color: transparent;
+          opacity: 1;
+        }
+     /* At top — transparent */
+        #shopify-section-{{ section.id }}:not(.is-scrolled) .header,
+        #shopify-section-{{ section.id }}:not(.is-scrolled) ~ .subcollections-bar {
+          background: none;
+          background-color: transparent;
+        }
+    /* MOBILE ONLY */
+      @media screen and (max-width: 768px) {
+
+        .header {
+          overflow: hidden;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+        }
+
+        .header-section .header:before,
+        [data-sticky-type="always"] .header:before {
+          background: none;
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        /* At top — transparent */
+        #shopify-section-{{ section.id }}:not(.is-scrolled) .header,
+        #shopify-section-{{ section.id }}:not(.is-scrolled) ~ .subcollections-bar {
+          background: none;
+          background-color: transparent;
+        }
+
+        /* Scrolled — transition back to default theme bg */
+        #shopify-section-{{ section.id }} .header,
+        #shopify-section-{{ section.id }} ~ .subcollections-bar {
+          transition: background-color 0.3s ease;
+        }
+        }
+  {% endstyle %}
+{% endunless %}
 
 {%- liquid
   assign header_layout = section.settings.header_layout
