@@ -5673,8 +5673,10 @@ ol {
 }
 
 .header-scrolled .header {
-  padding-block-start: calc(var(--section-padding-top) * 0.75);
-  padding-block-end: calc(var(--section-padding-bottom) * 0.75);
+  /* padding-block-start: calc(var(--section-padding-top) * 0.75); */
+  /* padding-block-end: calc(var(--section-padding-bottom) * 0.75); */
+  /* padding-block-start: calc(var(--section-padding-top) * 0.75); */
+  /* padding-block-end: calc(var(--section-padding-bottom) * 0.75); */
 }
 
 .header-section.header-scrolled .header::before {

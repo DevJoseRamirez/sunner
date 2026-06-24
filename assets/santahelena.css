@@ -262,8 +262,8 @@ nav.subcollections-nav.page-width{height: 13px !important;}
 
 
 .header.section--padding {
-    padding-block-start: 0px !important;
-    padding-block-end: 0px !important;
+    /* padding-block-start: 0px !important; */
+    /* padding-block-end: 0px !important; */
 }
 
 @media screen and (min-width: 1536px) {

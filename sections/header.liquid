@@ -1,162 +1,177 @@
 {% style %}
   #shopify-section-{{ section.id }} {
-    --section-padding-top: {{ section.settings.padding_top }}px;
-    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
-    --color-background: {{ section.settings.color_background.rgb }};
-    --color-foreground: {{ section.settings.color_text.rgb }};
-    --color-transparent: {{ section.settings.transparent_color_text.rgb }};
-    --color-localization: {{ section.settings.color_localization.rgb }};
-  }
+      --section-padding-top: {{ section.settings.padding_top }}px;
+      --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+      --color-background: {{ section.settings.color_background.rgb }};
+      --color-foreground: {{ section.settings.color_text.rgb }};
+      --color-transparent: {{ section.settings.transparent_color_text.rgb }};
+      --color-localization: {{ section.settings.color_localization.rgb }};
+    }
+    .header-sticky {
+      inset-block-start: 0px;
+    }
 {% endstyle %}
 
 {% comment %} NOT HOME PAGE {% endcomment %}
 {% unless template.name == 'index' %}
   {% style %}
     p.announcement-text.leading-tight {
-          font-size: 12px !important;
-      line-height: 0% !important;
-      letter-spacing: 0 !important;
-      font-family: Neue Haas Grotesk Display !important;
+    font-size: 12px !important;
+    line-height: 0% !important;
+    letter-spacing: 0 !important;
+    font-family: Neue Haas Grotesk Display !important;
     }
-      .header,
-          .subcollections-bar {
-            /* background: none; */
-            background-color: transperant;
-            border: none;
-            margin-top: 2px;
-          }
-         .topbar-section {
-            margin: 0;
-            width: 100%;
-          }
+    .header,
+    .subcollections-bar {
+    border: none;
+    margin-top: 0px;
+    margin-bottom: 0px;
+        padding-top: {{ section.settings.menu_padding }}px;
+    padding-bottom: {{ section.settings.menu_padding }}px;
 
-         .header-section .header:before,
-          [data-sticky-type="always"] .header:before {
-            background: none;
-            background-color: transparent;
-            opacity: 1;
-          }
-       /* At top — transparent */
-          #shopify-section-{{ section.id }}:not(.is-scrolled) .header,
-          #shopify-section-{{ section.id }}:not(.is-scrolled) ~ .subcollections-bar {
-            background: none;
-            background-color: transparent;
-          }
-      /* MOBILE ONLY */
-        @media screen and (max-width: 768px) {
+    }
+    .topbar-section {
+    margin: 0;
+    width: 100%;
+    }
 
-          .header {
-            overflow: hidden;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-          }
+    .header-section .header:before,
+    [data-sticky-type="always"] .header:before {
+    background: none;
+    background-color: transparent;
+    opacity: 1;
+    }
+    /* At top — transparent */
+    #shopify-section-{{ section.id }}:not(.is-scrolled) .header,
+    #shopify-section-{{ section.id }}:not(.is-scrolled) ~ .subcollections-bar {
+    background: none;
+    background-color: transparent;
+    }
+    /* MOBILE ONLY */
+    @media screen and (max-width: 768px) {
 
-          .header-section .header:before,
-          [data-sticky-type="always"] .header:before {
-            background: none;
-            background-color: transparent;
-            opacity: 1;
-          }
+    .header {
+    overflow: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+        margin-top: 0px;
+    margin-bottom: 0px;
+        padding-top: {{ section.settings.menu_padding }}px;
+    padding-bottom: {{ section.settings.menu_padding }}px;
+    padding-left: 4px;
+    padding-right: 6px;
+    }
 
-          /* At top — transparent */
-          #shopify-section-{{ section.id }}:not(.is-scrolled) .header,
-          #shopify-section-{{ section.id }}:not(.is-scrolled) ~ .subcollections-bar {
-            background: none;
-            background-color: transparent;
-          }
+    .header-section .header:before,
+    [data-sticky-type="always"] .header:before {
+    background: none;
+    background-color: transparent;
+    opacity: 1;
+    }
 
-          /* Scrolled — transition back to default theme bg */
-          #shopify-section-{{ section.id }} .header,
-          #shopify-section-{{ section.id }} ~ .subcollections-bar {
-            transition: background-color 0.3s ease;
-          }
-          }
+    /* At top — transparent */
+    #shopify-section-{{ section.id }}:not(.is-scrolled) .header,
+    #shopify-section-{{ section.id }}:not(.is-scrolled) ~ .subcollections-bar {
+    background: none;
+    background-color: transparent;
+    }
+
+    /* Scrolled — transition back to default theme bg */
+    #shopify-section-{{ section.id }} .header,
+    #shopify-section-{{ section.id }} ~ .subcollections-bar {
+    transition: background-color 0.3s ease;
+    }
+    }
   {% endstyle %}
 {% endunless %}
 {% comment %} HOME PAGE ONLY STYLES {% endcomment %}
 {% if template.name == 'index' %}
   {% style %}
-        #shopify-section-{{ section.id }} {
-          background: none;
-          background-color: transperant;
-        }
+    #shopify-section-{{ section.id }} {
+    background: none;
+    background-color: transperant;
+    }
 
-        .header,
-        .subcollections-bar {
-          background: none;
-          background-color: transperant;
-          border: none;
-          margin-top: 2px;
-        }
-        /* Subcollections bar */
-        .subcollections-bar {
-          overflow: visible;
-        }
+    .header,
+    .subcollections-bar {
+    background: none;
+    background-color: transperant;
+    border: none;
+    margin-top: 2px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+      padding-top: {{ section.settings.menu_padding }}px;
+    padding-bottom: {{ section.settings.menu_padding }}px;
+    }
+    /* Subcollections bar */
+    .subcollections-bar {
+    overflow: visible;
+    }
 
-        .subcollections-nav {
-          overflow-x: auto;
-          overflow-y: hidden;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-        }
+    .subcollections-nav {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    }
 
-        .subcollections-nav::-webkit-scrollbar {
-          display: none;
-        }
+    .subcollections-nav::-webkit-scrollbar {
+    display: none;
+    }
 
-        .subcollections-nav ul {
-          flex-wrap: nowrap;
-          width: max-content;
-          padding-right: 48px;
-        }
+    .subcollections-nav ul {
+    flex-wrap: nowrap;
+    width: max-content;
+    padding-right: 48px;
+    }
 
-        .subcollections-nav ul > li {
-          flex: 0 0 auto;
-        }
+    .subcollections-nav ul > li {
+    flex: 0 0 auto;
+    }
 
-        .subcollections-link {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 26px;
-          transition: all .3s ease-in-out;
-        }
-        . subcollections-link:hover {
-          background: rgba(0, 0, 0, 0.08);
-              width: 96px;
-      height: 26px;
-      padding: 0;
-      background: rgba(0, 0, 0, 0.08);
-        }
+    .subcollections-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+    transition: all .3s ease-in-out;
+    }
+    . subcollections-link:hover {
+    background: rgba(0, 0, 0, 0.08);
+    width: 96px;
+    height: 26px;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.08);
+    }
 
-        .subcollections-link.is-active {
-          background: #E5E5E5;
-          background: #ffffff5e;
-          width: 96px;
-          height: 26px;
-          padding: 0;
-          background: rgba(0, 0, 0, 0.08)
-        }
-      p.announcement-text.leading-tight {
-              font-size: 12px !important;
-          line-height: 0% !important;
-          letter-spacing: 0 !important;
-          font-family: Neue Haas Grotesk Display !important;
-          color: black;
+    .subcollections-link.is-active {
+    background: #E5E5E5;
+    background: #ffffff5e;
+    width: 96px;
+    height: 26px;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.08)
+    }
+    p.announcement-text.leading-tight {
+    font-size: 12px !important;
+    line-height: 0% !important;
+    letter-spacing: 0 !important;
+    font-family: Neue Haas Grotesk Display !important;
+    color: black;
 
-        }
-        /* styles overwrites */
-        .topbar,
-        .topbar-section {
-          background: none;
-          background-color: transperant;
-          color: black;
-        }
+    }
+    /* styles overwrites */
+    .topbar,
+    .topbar-section {
+    background: none;
+    background-color: transperant;
+    color: black;
+    }
 
-      .js .shopify-section-group-header-group .section:before {
-        background: none;
-          background-color: transperant;
+    .js .shopify-section-group-header-group .section:before {
+    background: none;
+    background-color: transperant;
     }
   {% endstyle %}
 {% endif %}
@@ -599,6 +614,22 @@
       "id": "color_localization",
       "label": "t:sections.header.settings.color_localization.label"
     },
+
+    {
+      "type": "header",
+      "content": "Top Menu Height"
+    },
+    {
+      "type": "range",
+      "id": "menu_padding",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Menu Height",
+      "default": 6
+    },
+
     {
       "type": "header",
       "content": "t:sections.global.settings.header__section.content"
