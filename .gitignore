@@ -22,3 +22,7 @@ node_modules/
 
 # Rails credentials key
 config/master.key
+
+
+# File Saves
+safe/
