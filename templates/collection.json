@@ -87,12 +87,38 @@
             "color_overlay": "#000000",
             "overlay_opacity": 30
           }
+        },
+        "collection_QGQ9h6": {
+          "type": "collection",
+          "settings": {
+            "collection": "denim",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_QAkDGp": {
+          "type": "collection",
+          "settings": {
+            "collection": "more",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
         }
       },
       "block_order": [
         "collection_CHeMLQ",
         "collection_WdxdML",
-        "collection_6xjx4w"
+        "collection_6xjx4w",
+        "collection_QGQ9h6",
+        "collection_QAkDGp"
       ],
       "custom_css": [
         ".media-card__link .media {display: none;}",

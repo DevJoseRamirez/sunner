@@ -147,12 +147,30 @@
             "products": [],
             "title": ""
           }
+        },
+        "collection_NA9aBa": {
+          "type": "collection",
+          "settings": {
+            "collection": "denim",
+            "products": [],
+            "title": ""
+          }
+        },
+        "collection_pqwDFi": {
+          "type": "collection",
+          "settings": {
+            "collection": "more",
+            "products": [],
+            "title": ""
+          }
         }
       },
       "block_order": [
         "collection_qA4UJW",
         "collection_49QVBW",
-        "collection_N4mfCG"
+        "collection_N4mfCG",
+        "collection_NA9aBa",
+        "collection_pqwDFi"
       ],
       "name": "t:sections.featured-collections.name",
       "settings": {

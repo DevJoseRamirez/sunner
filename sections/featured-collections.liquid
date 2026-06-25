@@ -1,44 +1,45 @@
 <style>
-  #shopify-section-{{ section.id }} {
-    --section-padding-top: {{ section.settings.padding_top }}px;
-    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
-    {%- render 'section-variables', section: section -%}
-  }
+    #shopify-section-{{ section.id }} {
+      --section-padding-top: {{ section.settings.padding_top }}px;
+      --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+      {%- render 'section-variables', section: section -%}
+    }
 
-  #shopify-section-{{ section.id }} .tab-list {
-    gap: 0 !important;
-  }
+    #shopify-section-{{ section.id }} .tab-list {
+      gap: 0 !important;
+    }
 
-  #shopify-section-{{ section.id }} .tab-list [role="tablist"] {
-    gap: 0 !important;
-  }
+    #shopify-section-{{ section.id }} .tab-list [role="tablist"] {
+      gap: 0 !important;
+    }
 
-  #shopify-section-{{ section.id }} .tab__item.button {
-    background: transparent !important;
-  }
+    #shopify-section-{{ section.id }} .tab__item.button {
+      background: transparent !important;
+    }
 
-  #shopify-section-{{ section.id }} .tab__item.button .btn-text {
-    position: relative;
-    z-index: 2;
-  }
+    #shopify-section-{{ section.id }} .tab__item.button .btn-text {
+      position: relative;
+      z-index: 2;
+      line-height: 1.25;
+    }
 
-  #shopify-section-{{ section.id }} .tab__item.button .btn-fill {
-    z-index: 1;
-  }
+    #shopify-section-{{ section.id }} .tab__item.button .btn-fill {
+      z-index: 1;
+    }
 
-  #shopify-section-{{ section.id }} .tab__item.button.button--primary,
-  #shopify-section-{{ section.id }} .tab__item.button[aria-selected="true"] {
-    background: #E5E5E5 !important;
-  }
+    #shopify-section-{{ section.id }} .tab__item.button.button--primary,
+    #shopify-section-{{ section.id }} .tab__item.button[aria-selected="true"] {
+      background: #E5E5E5 !important;
+    }
 
-  #shopify-section-template--19782234931396__featured_collections_d8KewC .tab-list [role="tablist"] {
-    gap: 0 !important;
-}
+    #shopify-section-template--19782234931396__featured_collections_d8KewC .tab-list [role="tablist"] {
+      gap: 0 !important;
+  }
 </style>
 
 {%- liquid
   assign section_rendering_api = false
-  if section.index == nil
+  if section.index == null
     assign section_rendering_api = true
   endif
 -%}
@@ -62,10 +63,15 @@
                   aria-controls="TabPanel-{{ block.id }}"
                   aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
                   data-index="{{ forloop.index0 }}"
-                  {{ block.shopify_attributes }}>
+                  {{ block.shopify_attributes }}
+                >
                   {%- unless forloop.first -%}
                     {%- unless section_rendering_api -%}
-                      <api-button class="api-only" data-id="TabPanelContent-{{ block.id }}" data-section-id="{{ section.id }}"></api-button>
+                      <api-button
+                        class="api-only"
+                        data-id="TabPanelContent-{{ block.id }}"
+                        data-section-id="{{ section.id }}"
+                      ></api-button>
                     {%- endunless -%}
                   {%- endunless -%}
                   <span class="btn-fill" data-fill></span>
@@ -77,6 +83,13 @@
                         echo 'onboarding.collection_title' | t | escape
                       endif
                     -%}
+                    {% comment %} testing {% endcomment %}
+                    {%- if collection.all_products_count > 0 -%}
+                      <small class="count font-medium absolute text-xs tracking-none whitespace-nowrap">
+                        {{- collection.all_products_count -}}
+                      </small>
+                    {%- endif -%}
+                    {% comment %} testing {% endcomment %}
                   </span>
                 </button>
               {%- endfor -%}
@@ -101,14 +114,33 @@
 
         {%- if section.settings.carousel_on_desktop -%}
           {%- for block in section.blocks -%}
-            <div class="indicators hidden lg:flex gap-2d5"{% unless forloop.first %} hidden{% endunless %} data-index="{{ forloop.index0 }}">
-              <button class="button button--secondary" type="button" is="previous-button" aria-controls="Slider-{{ block.id }}" aria-label="{{ 'general.pagination.previous' | t | escape }}" disabled>
+            <div
+              class="indicators hidden lg:flex gap-2d5"
+              {% unless forloop.first %}
+                hidden
+              {% endunless %}
+              data-index="{{ forloop.index0 }}"
+            >
+              <button
+                class="button button--secondary"
+                type="button"
+                is="previous-button"
+                aria-controls="Slider-{{ block.id }}"
+                aria-label="{{ 'general.pagination.previous' | t | escape }}"
+                disabled
+              >
                 <span class="btn-fill" data-fill></span>
                 <span class="btn-text">
                   {%- render 'icon', icon: 'chevron-left', class: 'transform' -%}
                 </span>
               </button>
-              <button class="button button--secondary" type="button" is="next-button" aria-controls="Slider-{{ block.id }}" aria-label="{{ 'general.pagination.next' | t | escape }}">
+              <button
+                class="button button--secondary"
+                type="button"
+                is="next-button"
+                aria-controls="Slider-{{ block.id }}"
+                aria-label="{{ 'general.pagination.next' | t | escape }}"
+              >
                 <span class="btn-fill" data-fill></span>
                 <span class="btn-text">
                   {%- render 'icon', icon: 'chevron-right', class: 'transform' -%}
@@ -124,10 +156,23 @@
           assign collection = block.settings.collection
           assign products = block.settings.products | default: collection.products
         -%}
-        <div id="TabPanel-{{ block.id }}" role="tabpanel"{% unless forloop.first %} hidden{% endunless %}>
+        <div
+          id="TabPanel-{{ block.id }}"
+          role="tabpanel"
+          {% unless forloop.first %}
+            hidden
+          {% endunless %}
+        >
           <div id="TabPanelContent-{{ block.id }}">
             {%- if section_rendering_api or forloop.first -%}
-              <slider-element id="Slider-{{ block.id }}" class="grid slider{% if section.settings.carousel_on_desktop %} slider--desktop{% endif %}{% if section.settings.swipe_on_mobile %} slider--tablet{% endif %}" selector=".card-grid>.card"{% if section.settings.carousel_on_desktop or section.settings.swipe_on_mobile %} tabindex="0"{% endif %}>
+              <slider-element
+                id="Slider-{{ block.id }}"
+                class="grid slider{% if section.settings.carousel_on_desktop %} slider--desktop{% endif %}{% if section.settings.swipe_on_mobile %} slider--tablet{% endif %}"
+                selector=".card-grid>.card"
+                {% if section.settings.carousel_on_desktop or section.settings.swipe_on_mobile %}
+                  tabindex="0"
+                {% endif %}
+              >
                 <div class="product-grid card-grid card-grid--{{ section.settings.columns }} mobile:card-grid--{{ section.settings.columns_mobile }} grid">
                   {%- for product in products limit: section.settings.product_limit -%}
                     {%- render 'product-card',
@@ -155,7 +200,7 @@
                     {%- for i in (1..section.settings.product_limit) -%}
                       {%- capture placeholder -%}product-{% cycle '1', '2', '3', '4', '5', '6' %}{%- endcapture -%}
                       {%- render 'product-card-placeholder',
-                        placeholder: placeholder
+                        placeholder: placeholder,
                         image_ratio: settings.product_image_ratio,
                         show_vendor: settings.product_vendor
                       -%}
@@ -164,9 +209,17 @@
                 </div>
               </slider-element>
 
-              {%- if section.settings.show_view_all and collection != blank and section.settings.product_limit < collection.all_products_count -%}
+              {%- if section.settings.show_view_all
+                and collection != blank
+                and section.settings.product_limit < collection.all_products_count
+              -%}
                 <p class="text-center">
-                  <a class="button button--secondary icon-with-text" href="{{ collection.url }}" is="hover-link" aria-label="{{ 'sections.featured_collection.view_all_label' | t: collection_name: collection.title }}">
+                  <a
+                    class="button button--secondary icon-with-text"
+                    href="{{ collection.url }}"
+                    is="hover-link"
+                    aria-label="{{ 'sections.featured_collection.view_all_label' | t: collection_name: collection.title }}"
+                  >
                     <span class="btn-fill" data-fill></span>
                     <span class="btn-text">
                       {%- liquid
@@ -186,71 +239,73 @@
 </div>
 
 <script>
-(function () {
-  "use strict";
+  (function () {
+    'use strict';
 
-  var root = document.getElementById("shopify-section-{{ section.id }}");
-  if (!root) return;
+    var root = document.getElementById('shopify-section-{{ section.id }}');
+    if (!root) return;
 
-  var tabsEl = root.querySelector("tabs-element");
-  if (!tabsEl) return;
+    var tabsEl = root.querySelector('tabs-element');
+    if (!tabsEl) return;
 
-  function toArr(nl) { return Array.prototype.slice.call(nl); }
-
-  function activate(index) {
-    var tabs = toArr(tabsEl.querySelectorAll('button[role="tab"][aria-controls][data-index]'));
-    var panels = toArr(root.querySelectorAll('[role="tabpanel"][id^="TabPanel-"]'));
-    var indicators = toArr(tabsEl.querySelectorAll(".indicators[data-index]"));
-
-    for (var i = 0; i < tabs.length; i++) {
-      var isActive = String(i) === String(index);
-      tabs[i].classList.toggle("button--primary", isActive);
-      tabs[i].classList.toggle("button--secondary", !isActive);
-      tabs[i].setAttribute("aria-selected", isActive ? "true" : "false");
+    function toArr(nl) {
+      return Array.prototype.slice.call(nl);
     }
 
-    for (var p = 0; p < panels.length; p++) {
-      panels[p].hidden = String(p) !== String(index);
+    function activate(index) {
+      var tabs = toArr(tabsEl.querySelectorAll('button[role="tab"][aria-controls][data-index]'));
+      var panels = toArr(root.querySelectorAll('[role="tabpanel"][id^="TabPanel-"]'));
+      var indicators = toArr(tabsEl.querySelectorAll('.indicators[data-index]'));
+
+      for (var i = 0; i < tabs.length; i++) {
+        var isActive = String(i) === String(index);
+        tabs[i].classList.toggle('button--primary', isActive);
+        tabs[i].classList.toggle('button--secondary', !isActive);
+        tabs[i].setAttribute('aria-selected', isActive ? 'true' : 'false');
+      }
+
+      for (var p = 0; p < panels.length; p++) {
+        panels[p].hidden = String(p) !== String(index);
+      }
+
+      for (var k = 0; k < indicators.length; k++) {
+        indicators[k].hidden = String(indicators[k].getAttribute('data-index')) !== String(index);
+      }
+
+      var btn = tabsEl.querySelector('button[role="tab"][data-index="' + index + '"]');
+      if (btn) {
+        var apiBtn = btn.querySelector('api-button');
+        if (apiBtn && typeof apiBtn.click === 'function') apiBtn.click();
+      }
     }
 
-    for (var k = 0; k < indicators.length; k++) {
-      indicators[k].hidden = String(indicators[k].getAttribute("data-index")) !== String(index);
-    }
+    tabsEl.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest('button[role="tab"][data-index]') : null;
+      if (!btn || !tabsEl.contains(btn)) return;
 
-    var btn = tabsEl.querySelector('button[role="tab"][data-index="' + index + '"]');
-    if (btn) {
-      var apiBtn = btn.querySelector("api-button");
-      if (apiBtn && typeof apiBtn.click === "function") apiBtn.click();
-    }
-  }
+      e.preventDefault();
 
-  tabsEl.addEventListener("click", function (e) {
-    var btn = e.target && e.target.closest ? e.target.closest('button[role="tab"][data-index]') : null;
-    if (!btn || !tabsEl.contains(btn)) return;
+      var idx = btn.getAttribute('data-index');
+      if (idx == null) return;
 
-    e.preventDefault();
+      activate(idx);
+    });
 
-    var idx = btn.getAttribute("data-index");
-    if (idx == null) return;
-
-    activate(idx);
-  });
-
-  activate(0);
-})();
+    activate(0);
+  })();
 </script>
 
 {%- if section.settings.swatches_use_images -%}
-<script>
-(function () {
-  "use strict";
+  <script>
+    (function () {
+      'use strict';
 
-  var sectionId = "shopify-section-{{ section.id }}";
-  var root = document.getElementById(sectionId) || document;
-  if (!root) return;
+      var sectionId = 'shopify-section-{{ section.id }}';
+      var root = document.getElementById(sectionId) || document;
+      if (!root) return;
 
-  var style = document.createElement("style");
-  style.innerHTML = `
+      var style = document.createElement('style');
+      style.innerHTML = `
     #${sectionId} .swatches .color-swatch {
       width: 8px !important;
       height: 8px !important;
@@ -274,64 +329,66 @@
       box-shadow: none !important;
     }
   `;
-  document.head.appendChild(style);
+      document.head.appendChild(style);
 
-var MAP = {
-  "jet": "#0b0b0b",
-  "black": "#0b0b0b",
+      var MAP = {
+        jet: '#0b0b0b',
+        black: '#0b0b0b',
 
-  "tea": "#f2f0ea",
-  "cream": "#f4efe4",
-  "white": "#ffffff",
+        tea: '#f2f0ea',
+        cream: '#f4efe4',
+        white: '#ffffff',
 
-  "soil": "#6a4a33",
-  "brown": "#6a4a33",
+        soil: '#6a4a33',
+        brown: '#6a4a33',
 
-  "sun blu": "#9fb8c8",
-  "sand wash": "#b8c8c9",
+        'sun blu': '#9fb8c8',
+        'sand wash': '#b8c8c9',
 
-  "tea/pink": "#e8c8c6"
-};
+        'tea/pink': '#e8c8c6',
+      };
 
-  function norm(v) {
-    return (v || "").trim().toLowerCase().replace(/^['"]|['"]$/g, "");
-  }
+      function norm(v) {
+        return (v || '')
+          .trim()
+          .toLowerCase()
+          .replace(/^['"]|['"]$/g, '');
+      }
 
-  function pickToken(el) {
-    var cs = getComputedStyle(el);
-    var token = norm(cs.getPropertyValue("--swatch-background"));
-    if (token) return token;
+      function pickToken(el) {
+        var cs = getComputedStyle(el);
+        var token = norm(cs.getPropertyValue('--swatch-background'));
+        if (token) return token;
 
-    var label = el.getAttribute("aria-label") || el.getAttribute("title") || "";
-    label = norm(label);
-    var dash = label.lastIndexOf("-");
-    if (dash !== -1) return norm(label.slice(dash + 1));
+        var label = el.getAttribute('aria-label') || el.getAttribute('title') || '';
+        label = norm(label);
+        var dash = label.lastIndexOf('-');
+        if (dash !== -1) return norm(label.slice(dash + 1));
 
-    return "";
-  }
+        return '';
+      }
 
-  function apply(el) {
-    var token = pickToken(el);
-    var color = MAP[token];
-    if (!color) return;
+      function apply(el) {
+        var token = pickToken(el);
+        var color = MAP[token];
+        if (!color) return;
 
-    el.style.backgroundImage = "none";
-    el.style.setProperty("--swatch-background-image", "none");
-    el.style.backgroundColor = color;
-  }
+        el.style.backgroundImage = 'none';
+        el.style.setProperty('--swatch-background-image', 'none');
+        el.style.backgroundColor = color;
+      }
 
-  function run() {
-    var nodes = root.querySelectorAll(".swatches .color-swatch");
-    for (var i = 0; i < nodes.length; i++) apply(nodes[i]);
-  }
+      function run() {
+        var nodes = root.querySelectorAll('.swatches .color-swatch');
+        for (var i = 0; i < nodes.length; i++) apply(nodes[i]);
+      }
 
-  run();
+      run();
 
-  var mo = new MutationObserver(run);
-  mo.observe(root, { childList: true, subtree: true });
-})();
-</script>
-
+      var mo = new MutationObserver(run);
+      mo.observe(root, { childList: true, subtree: true });
+    })();
+  </script>
 {%- endif -%}
 
 {% schema %}
@@ -424,9 +481,18 @@ var MAP = {
       "id": "heading_alignment",
       "label": "t:sections.global.settings.heading_alignment.label",
       "options": [
-        { "value": "text-left md:items-end md:flex-row", "label": "t:sections.global.settings.heading_alignment.options__1.label" },
-        { "value": "text-center md:items-center", "label": "t:sections.global.settings.heading_alignment.options__2.label" },
-        { "value": "text-right md:items-end md:flex-row-reverse", "label": "t:sections.global.settings.heading_alignment.options__3.label" }
+        {
+          "value": "text-left md:items-end md:flex-row",
+          "label": "t:sections.global.settings.heading_alignment.options__1.label"
+        },
+        {
+          "value": "text-center md:items-center",
+          "label": "t:sections.global.settings.heading_alignment.options__2.label"
+        },
+        {
+          "value": "text-right md:items-end md:flex-row-reverse",
+          "label": "t:sections.global.settings.heading_alignment.options__3.label"
+        }
       ],
       "default": "text-left md:items-end md:flex-row"
     },
@@ -492,12 +558,28 @@ var MAP = {
     },
     { "type": "color", "id": "color_text", "label": "t:sections.global.settings.color_text.label" },
     { "type": "color", "id": "color_background", "label": "t:sections.global.settings.color_background.label" },
-    { "type": "color_background", "id": "gradient_background", "label": "t:sections.global.settings.gradient_background.label" },
+    {
+      "type": "color_background",
+      "id": "gradient_background",
+      "label": "t:sections.global.settings.gradient_background.label"
+    },
     { "type": "color", "id": "color_highlight", "label": "t:sections.global.settings.color_highlight.label" },
-    { "type": "color_background", "id": "gradient_highlight", "label": "t:sections.global.settings.gradient_highlight.label" },
+    {
+      "type": "color_background",
+      "id": "gradient_highlight",
+      "label": "t:sections.global.settings.gradient_highlight.label"
+    },
     { "type": "color", "id": "color_button_text", "label": "t:sections.global.settings.color_button_text.label" },
-    { "type": "color", "id": "color_button_background", "label": "t:sections.global.settings.color_button_background.label" },
-    { "type": "color_background", "id": "color_button_gradient", "label": "t:sections.global.settings.color_button_gradient.label" },
+    {
+      "type": "color",
+      "id": "color_button_background",
+      "label": "t:sections.global.settings.color_button_background.label"
+    },
+    {
+      "type": "color_background",
+      "id": "color_button_gradient",
+      "label": "t:sections.global.settings.color_button_gradient.label"
+    },
     { "type": "header", "content": "t:sections.global.settings.header__section.content" },
     {
       "type": "range",
@@ -520,7 +602,12 @@ var MAP = {
       "default": 72
     },
     { "type": "checkbox", "id": "divider", "label": "t:sections.global.settings.divider.label", "default": false },
-    { "type": "checkbox", "id": "full_width", "label": "t:sections.global.settings.full_width.label", "default": false },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.global.settings.full_width.label",
+      "default": false
+    },
     { "type": "checkbox", "id": "rounded", "default": false, "label": "t:sections.global.settings.rounded.label" }
   ],
   "blocks": [
@@ -529,7 +616,12 @@ var MAP = {
       "name": "t:sections.global.blocks.collection.name",
       "settings": [
         { "type": "collection", "id": "collection", "label": "t:sections.global.settings.collection.label" },
-        { "type": "product_list", "id": "products", "label": "t:sections.global.settings.products.label", "info": "t:sections.global.settings.products.info" },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "t:sections.global.settings.products.label",
+          "info": "t:sections.global.settings.products.info"
+        },
         { "type": "text", "id": "title", "label": "t:sections.global.settings.title.label" }
       ]
     }
@@ -538,14 +630,11 @@ var MAP = {
     {
       "name": "t:sections.featured-collections.name",
       "category": "t:categories.collections",
-      "blocks": [
-        { "type": "collection" },
-        { "type": "collection" }
-      ]
+      "blocks": [{ "type": "collection" }, { "type": "collection" }]
     }
   ],
   "disabled_on": {
-    "templates": [ "password" ]
+    "templates": ["password"]
   }
 }
 {% endschema %}
